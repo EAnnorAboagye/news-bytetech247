@@ -114,6 +114,9 @@ const articleJsonLdBlocks = [
   description={post.data.description}
   type="article"
   image={post.data.coverImage.src}
+  imageAlt={post.data.coverImageAlt}
+  imageWidth={post.data.coverImage.width}
+  imageHeight={post.data.coverImage.height}
   preloadImage={preloadCover.src}
   markdownUrl={markdownUrl}
   jsonLd={articleJsonLdBlocks}
@@ -151,26 +154,32 @@ const articleJsonLdBlocks = [
         <a href={markdownUrl}>View as Markdown</a>
       </p>
 
-      <Picture
-        src={post.data.coverImage}
-        alt={post.data.coverImageAlt}
-        widths={[640, 1024, 1600]}
-        sizes="(min-width: 64rem) 46rem, 100vw"
-        formats={["avif", "webp"]}
-        loading="eager"
-        fetchpriority="high"
-        class="post-cover"
-      />
-      {
-        post.data.coverImageCredit && (
-          <p class="post-cover-credit">
-            Photo by{" "}
-            <a href={post.data.coverImageCredit.url} rel="noopener">
-              {post.data.coverImageCredit.name}
-            </a>
-          </p>
-        )
-      }
+      <figure class="post-cover-figure">
+        <Picture
+          src={post.data.coverImage}
+          alt={post.data.coverImageAlt}
+          widths={[640, 1024, 1600]}
+          sizes="(min-width: 64rem) 46rem, 100vw"
+          formats={["avif", "webp"]}
+          loading="eager"
+          fetchpriority="high"
+          class="post-cover"
+        />
+        <figcaption class="post-cover-caption">
+          {
+            post.data.coverImageCredit ? (
+              <>
+                Photo by{" "}
+                <a href={post.data.coverImageCredit.url} rel="noopener">
+                  {post.data.coverImageCredit.name}
+                </a>
+              </>
+            ) : (
+              "Illustration"
+            )
+          }
+        </figcaption>
+      </figure>
 
       <AdSlot
         adSlot={siteConfig.adSlots.articleAfterLead}
@@ -281,23 +290,25 @@ const articleJsonLdBlocks = [
     padding-left: 0;
   }
 
+  .post-cover-figure {
+    margin: calc(var(--spacing) * 4) 0;
+  }
+
   .post-cover {
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 0.75rem;
-    margin: calc(var(--spacing) * 4) 0;
   }
 
-  .post-cover-credit {
-    margin-top: calc(var(--spacing) * -3);
-    margin-bottom: calc(var(--spacing) * 4);
+  .post-cover-caption {
+    margin-top: var(--spacing);
     font-size: var(--text-xs);
     color: var(--color-fg-muted);
     text-align: right;
   }
 
-  .post-cover-credit a {
+  .post-cover-caption a {
     color: inherit;
   }
 

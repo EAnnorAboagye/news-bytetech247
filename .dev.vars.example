@@ -8,3 +8,15 @@
 # unguessable in production. Generate one with:
 #   node -e "console.log(crypto.randomUUID())"
 CSP_NONCE_SECRET=your-local-dev-secret-here
+
+# Cloudflare Workers AI credentials for scripts/generate-conceptual-cover.mjs
+# (news-article skill's default cover-image source — see SKILL.md §6). A
+# separate concern from the CLOUDFLARE_API_TOKEN GitHub Actions secret
+# that deploys the Worker: this one is used locally, at authoring time,
+# to call the Workers AI REST API directly, never shipped to the deployed
+# Worker. Needs the "Workers AI" permission (Read is sufficient for
+# inference) — check/add that permission on a token before assuming an
+# existing deploy token already covers it. Account ID is on any zone's
+# Overview page in the Cloudflare dashboard.
+CLOUDFLARE_API_TOKEN=your-cloudflare-api-token-here
+CLOUDFLARE_ACCOUNT_ID=your-cloudflare-account-id-here

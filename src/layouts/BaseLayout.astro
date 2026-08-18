@@ -27,6 +27,11 @@ interface Props {
   showReadingProgress?: boolean;
   /** Absolute OG/Twitter image URL. Defaults to siteConfig.defaultOgImage. */
   image?: string;
+  /** Alt text for the OG/Twitter image, if known. */
+  imageAlt?: string;
+  /** Pixel dimensions of the OG/Twitter image, if known. */
+  imageWidth?: number;
+  imageHeight?: number;
   /** og:type — "article" on post pages, "website" everywhere else. */
   type?: "website" | "article";
   /**
@@ -53,6 +58,9 @@ const {
   description = siteConfig.description,
   showReadingProgress = false,
   image = siteConfig.defaultOgImage ?? undefined,
+  imageAlt,
+  imageWidth,
+  imageHeight,
   type = "website",
   jsonLd,
   preloadImage,
@@ -225,10 +233,30 @@ const jsonLdBlocks = [
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     {absoluteImage && <meta property="og:image" content={absoluteImage} />}
+    {
+      absoluteImage && imageAlt && (
+        <meta property="og:image:alt" content={imageAlt} />
+      )
+    }
+    {
+      absoluteImage && imageWidth && (
+        <meta property="og:image:width" content={String(imageWidth)} />
+      )
+    }
+    {
+      absoluteImage && imageHeight && (
+        <meta property="og:image:height" content={String(imageHeight)} />
+      )
+    }
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {absoluteImage && <meta name="twitter:image" content={absoluteImage} />}
+    {
+      absoluteImage && imageAlt && (
+        <meta name="twitter:image:alt" content={imageAlt} />
+      )
+    }
 
     {
       preloadImage && (
