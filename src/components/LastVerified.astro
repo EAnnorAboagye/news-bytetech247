@@ -1,0 +1,38 @@
+---
+// Freshness signal from git history (src/lib/last-verified.ts), not a
+// manually-bumped date. Renders nothing if the file has no commit
+// history yet. Ported from bytetech247.com's LastVerified.astro with
+// one copy change: "Updated" rather than "Last verified" — this site's
+// version of this field is more load-bearing than the guides-site
+// original, since it's what a real correction should surface honestly
+// (see the editorial policy page, Phase 11), not a periodic evergreen-
+// content re-check.
+interface Props {
+  date: Date | null;
+}
+
+const { date } = Astro.props;
+---
+
+{
+  date && (
+    <p class="last-verified">
+      Updated{" "}
+      <time datetime={date.toISOString()}>
+        {date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          timeZone: "UTC",
+        })}
+      </time>
+    </p>
+  )
+}
+
+<style>
+  .last-verified {
+    font-size: var(--text-xs);
+    color: var(--color-fg-muted);
+  }
+</style>

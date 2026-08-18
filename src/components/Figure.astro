@@ -1,0 +1,68 @@
+---
+// Ported verbatim from bytetech247.com. alt is deliberately required —
+// build/type error if omitted. <Picture>, not <Image> — emits a real
+// <picture> with AVIF as the primary source and WebP as fallback.
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+  // Only present when the image is a sourced/wire photo — omitted for
+  // an original screenshot/photo, never fabricated.
+  credit?: { name: string; url: string };
+}
+
+const { src, alt, caption, credit } = Astro.props;
+---
+
+<figure class="figure">
+  <Picture
+    src={src}
+    alt={alt}
+    formats={["avif", "webp"]}
+    loading="lazy"
+    class="figure__image"
+  />
+  {
+    (caption || credit) && (
+      <figcaption class="figure__caption">
+        {caption}
+        {caption && credit && " "}
+        {credit && (
+          <>
+            Photo by{" "}
+            <a href={credit.url} rel="noopener">
+              {credit.name}
+            </a>
+          </>
+        )}
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .figure {
+    margin: calc(var(--spacing) * 4) 0;
+  }
+
+  .figure__image {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .figure__caption {
+    margin-top: var(--spacing);
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+    text-align: center;
+  }
+
+  .figure__caption a {
+    color: inherit;
+  }
+</style>

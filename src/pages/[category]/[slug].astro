@@ -1,0 +1,483 @@
+---
+// Article template (build plan Phase 7). Forked from bytetech247.com's
+// [category]/[slug].astro for the getStaticPaths validation, JSON-LD
+// image-crop generation, and preloadCover reasoning — but structurally
+// simplified: no TOCSidebar (short news posts have no ToC-worthy
+// length, so .post-layout is a single reading column, not a sidebar
+// grid), no FaqSection/Callout/CodeTabs/Benchmark (guide-specific, no
+// schema field or MDX usage on this site), no series prev/next nav (no
+// series/seriesOrder field — see content.config.ts). Ad positions are
+// the 3 proposed in the build plan (articleHeader/articleAfterLead/
+// articleBeforeRelated), not bytetech247.com's 8 — there's no pillar-
+// cluster nav or Quick Answer box to hang the other 5 on.
+import { getCollection, render } from "astro:content";
+import type { InferGetStaticPropsType } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PostCard from "../../components/PostCard.astro";
+import TagPill from "../../components/TagPill.astro";
+import Figure from "../../components/Figure.astro";
+import LastVerified from "../../components/LastVerified.astro";
+import ShareButtons from "../../components/ShareButtons.astro";
+import AuthorBio from "../../components/AuthorBio.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { Picture, getImage } from "astro:assets";
+import { siteConfig, getCategoryName } from "../../config";
+import { validateCoverImage } from "../../lib/validate-cover-image";
+import { validateNoH1InBody } from "../../lib/validate-no-h1-in-body";
+import { calculateReadingTime } from "../../lib/reading-time";
+import { getRelatedPosts } from "../../lib/related-posts";
+import { getRecentPosts } from "../../lib/recent-posts";
+import { getLastVerifiedDate } from "../../lib/last-verified";
+import { articleJsonLd, breadcrumbJsonLd } from "../../lib/json-ld";
+import { slugifyTag } from "../../lib/taxonomy";
+import { pageTitle } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  for (const post of posts) {
+    validateCoverImage(post);
+    validateNoH1InBody(post);
+  }
+  return posts.map((post) => ({
+    params: { category: post.data.category, slug: post.id },
+    props: { post, allPosts: posts },
+  }));
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { post, allPosts } = Astro.props as Props;
+const { Content } = await render(post);
+const categoryName = getCategoryName(post.data.category);
+const readingTime = calculateReadingTime(post.body ?? "");
+const relatedPosts = getRelatedPosts(post, allPosts);
+const recentPosts = getRecentPosts(
+  post,
+  allPosts,
+  relatedPosts.map((p) => p.id),
+);
+const lastVerifiedDate = getLastVerifiedDate(
+  `src/content/blog/${post.id}/index.mdx`,
+);
+
+// Google's Article structured data guidelines recommend supplying the
+// same image in 16x9, 4x3, and 1x1 for best rich-result eligibility.
+// 900x900 (not a rounder number) is the largest square this source can
+// provide without upscaling — validateCoverImage only guarantees
+// >=1600x900, a 16:9 minimum, and Astro/sharp's image service defaults
+// to withoutEnlargement: true.
+const cropped4x3 = await getImage({
+  src: post.data.coverImage,
+  width: 1200,
+  height: 900,
+  format: "jpg",
+});
+const cropped1x1 = await getImage({
+  src: post.data.coverImage,
+  width: 900,
+  height: 900,
+  format: "jpg",
+});
+
+// BaseLayout's preloadImage hint must point at the same small, already-
+// optimized asset the cover <Picture> below actually requests, not the
+// raw source — same reasoning as the homepage's heroPreload.
+const preloadCover = await getImage({
+  src: post.data.coverImage,
+  width: 640,
+  format: "avif",
+});
+
+const pageUrl = new URL(Astro.url.pathname, siteConfig.url).href;
+const markdownUrl = new URL(
+  `/${post.data.category}/${post.id}.md`,
+  siteConfig.url,
+).href;
+const categoryUrl = new URL(`/${post.data.category}/`, siteConfig.url).href;
+const breadcrumbItems = [
+  { name: "Home", url: siteConfig.url },
+  { name: categoryName, url: categoryUrl },
+  { name: post.data.title, url: pageUrl },
+];
+const articleJsonLdBlocks = [
+  articleJsonLd(post, pageUrl, lastVerifiedDate, [
+    cropped4x3.src,
+    cropped1x1.src,
+  ]),
+  breadcrumbJsonLd(breadcrumbItems),
+];
+---
+
+<BaseLayout
+  title={pageTitle(post.data.title, categoryName)}
+  description={post.data.description}
+  type="article"
+  image={post.data.coverImage.src}
+  preloadImage={preloadCover.src}
+  markdownUrl={markdownUrl}
+  jsonLd={articleJsonLdBlocks}
+  showReadingProgress
+>
+  <div class="post-layout">
+    <AdSlot
+      adSlot={siteConfig.adSlots.articleHeader}
+      size="banner"
+      label="Advertisement"
+      class="post-header-ad"
+    />
+
+    <article class="post-article">
+      <Breadcrumbs items={breadcrumbItems} />
+
+      <h1>{post.data.title}</h1>
+      <p class="post-meta">
+        {siteConfig.author.name && <>By {siteConfig.author.name} · </>}
+        <time datetime={post.data.date.toISOString()}>
+          {
+            post.data.date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              timeZone: "UTC",
+            })
+          }
+        </time>{" "}
+        · {readingTime} min read
+      </p>
+      <LastVerified date={lastVerifiedDate} />
+      <ShareButtons url={pageUrl} title={post.data.title} class="post-share" />
+      <p class="post-markdown-link">
+        <a href={markdownUrl}>View as Markdown</a>
+      </p>
+
+      <Picture
+        src={post.data.coverImage}
+        alt={post.data.coverImageAlt}
+        widths={[640, 1024, 1600]}
+        sizes="(min-width: 64rem) 46rem, 100vw"
+        formats={["avif", "webp"]}
+        loading="eager"
+        fetchpriority="high"
+        class="post-cover"
+      />
+      {
+        post.data.coverImageCredit && (
+          <p class="post-cover-credit">
+            Photo by{" "}
+            <a href={post.data.coverImageCredit.url} rel="noopener">
+              {post.data.coverImageCredit.name}
+            </a>
+          </p>
+        )
+      }
+
+      <AdSlot
+        adSlot={siteConfig.adSlots.articleAfterLead}
+        size="rectangle"
+        label="Advertisement"
+        class="post-ad"
+      />
+
+      <div class="article-content">
+        <Content components={{ Figure }} />
+      </div>
+
+      <div class="post-author">
+        <AuthorBio />
+      </div>
+
+      {
+        post.data.tags.length > 0 && (
+          <ul class="post-tags">
+            {post.data.tags.map((tag) => (
+              <li>
+                <TagPill href={`/tag/${slugifyTag(tag)}/`}>{tag}</TagPill>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        relatedPosts.length > 0 && (
+          <>
+            <AdSlot
+              adSlot={siteConfig.adSlots.articleBeforeRelated}
+              size="rectangle"
+              label="Advertisement"
+              class="post-ad"
+            />
+            <section aria-label="Related posts" class="related-posts">
+              <h2>Related posts</h2>
+              <div class="related-posts__grid">
+                {relatedPosts.map((related) => (
+                  <PostCard post={related} />
+                ))}
+              </div>
+            </section>
+          </>
+        )
+      }
+
+      {
+        recentPosts.length > 0 && (
+          <section aria-label="Recent posts" class="recent-posts">
+            <h2>Recent posts</h2>
+            <div class="recent-posts__grid">
+              {recentPosts.map((recent) => (
+                <PostCard post={recent} />
+              ))}
+            </div>
+          </section>
+        )
+      }
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    font-family: var(--font-serif);
+    letter-spacing: normal;
+  }
+
+  .post-markdown-link {
+    margin: calc(var(--spacing) * 2) 0 0;
+    font-size: var(--text-sm);
+  }
+
+  .post-markdown-link a {
+    color: var(--color-fg-muted);
+  }
+
+  .post-markdown-link a:hover {
+    text-decoration: underline;
+  }
+
+  /* Single reading column, no sidebar — this site's articles have no
+     ToC-worthy length, so there's no second grid track to reserve. */
+  .post-layout {
+    max-width: 46rem;
+    margin-inline: auto;
+    padding: calc(var(--spacing) * 6) 0;
+  }
+
+  .post-header-ad {
+    max-width: 72rem;
+    margin: 0 auto calc(var(--spacing) * 6);
+  }
+
+  .post-meta {
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+  }
+
+  :global(.post-share) {
+    margin-top: calc(var(--spacing) * 1);
+  }
+
+  :global(.post-share .share-buttons__trigger) {
+    padding-left: 0;
+  }
+
+  .post-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    margin: calc(var(--spacing) * 4) 0;
+  }
+
+  .post-cover-credit {
+    margin-top: calc(var(--spacing) * -3);
+    margin-bottom: calc(var(--spacing) * 4);
+    font-size: var(--text-xs);
+    color: var(--color-fg-muted);
+    text-align: right;
+  }
+
+  .post-cover-credit a {
+    color: inherit;
+  }
+
+  :global(.post-ad) {
+    margin: calc(var(--spacing) * 8) 0;
+  }
+
+  @media (max-width: 48rem) {
+    :global(.post-ad) {
+      margin: calc(var(--spacing) * 5) 0;
+    }
+  }
+
+  .post-author {
+    margin: calc(var(--spacing) * 8) 0;
+    padding: calc(var(--spacing) * 4);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    background-color: var(--color-bg-subtle);
+  }
+
+  .post-tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing);
+    margin: calc(var(--spacing) * 6) 0 0;
+    padding: 0;
+  }
+
+  .related-posts,
+  .recent-posts {
+    margin-top: calc(var(--spacing) * 8);
+  }
+
+  .related-posts__grid,
+  .recent-posts__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing) * 4);
+    margin-top: calc(var(--spacing) * 4);
+  }
+
+  @media (min-width: 40rem) {
+    .related-posts__grid,
+    .recent-posts__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Prose rhythm for the rendered MDX body. font-size is a scoped fluid
+     clamp (not the global --text-base) so this reading column gets
+     slightly larger type on wide viewports without resizing buttons/
+     nav/forms sitewide; line-height is a touch more open than the site
+     default for sustained reading. */
+  .article-content {
+    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+    line-height: 1.7;
+  }
+
+  .article-content :global(h2),
+  .article-content :global(h3),
+  .article-content :global(h4) {
+    font-family: var(--font-serif);
+    letter-spacing: normal;
+  }
+
+  .article-content :global(p) {
+    margin: 0 0 1.25em;
+  }
+
+  .article-content :global(a):not(.astro-code a) {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .article-content :global(a):not(.astro-code a):hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .article-content :global(h2) {
+    margin: 2.5em 0 1em;
+  }
+
+  .article-content :global(h3) {
+    margin: 2em 0 0.75em;
+  }
+
+  .article-content :global(h4) {
+    margin: 1.5em 0 0.5em;
+  }
+
+  .article-content :global(> :first-child) {
+    margin-top: 0;
+  }
+
+  .article-content :global(ul),
+  .article-content :global(ol) {
+    margin: 0 0 1.25em;
+    padding-inline-start: 1.5em;
+  }
+
+  .article-content :global(li) {
+    margin-top: 0.4em;
+  }
+
+  .article-content :global(blockquote) {
+    margin: 1.5em 0;
+    padding-inline-start: 1em;
+    border-left: 3px solid var(--color-border);
+    color: var(--color-fg-muted);
+  }
+
+  .article-content :global(table) {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    margin: calc(var(--spacing) * 4) 0;
+  }
+
+  .article-content :global(thead) {
+    position: sticky;
+    top: 0;
+    background-color: var(--color-bg);
+  }
+
+  .article-content :global(th),
+  .article-content :global(td) {
+    border: 1px solid var(--color-border);
+    padding: var(--spacing) calc(var(--spacing) * 2);
+    text-align: left;
+  }
+
+  .article-content :global(tbody tr:nth-child(even)) {
+    background-color: var(--color-bg-subtle);
+  }
+
+  /* Shiki's own generated markup (github-dark theme, fixed regardless
+     of the site's light/dark toggle — same documented exception
+     bytetech247.com makes). No filename-header/copy-button chrome here
+     — that requires a rehype plugin (rehypeCodeBlockChrome) that wasn't
+     ported for v1; plain highlighted+line-numbered code blocks only. */
+  .article-content :global(.astro-code) {
+    margin: calc(var(--spacing) * 4) 0;
+    padding: calc(var(--spacing) * 3);
+    border-radius: 0.5rem;
+    border: 1px solid #30363d;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  .article-content :global(code:not(pre code)) {
+    overflow-wrap: break-word;
+  }
+
+  .article-content :global(.astro-code code) {
+    counter-reset: line;
+  }
+
+  .article-content :global(.astro-code .line) {
+    display: block;
+    position: relative;
+    counter-increment: line;
+    padding-left: calc(var(--spacing) * 4);
+    min-height: 1lh;
+  }
+
+  .article-content :global(.astro-code .line::before) {
+    content: counter(line);
+    position: absolute;
+    left: 0;
+    width: calc(var(--spacing) * 3);
+    text-align: right;
+    color: #6e7681;
+    user-select: none;
+  }
+</style>

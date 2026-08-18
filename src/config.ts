@@ -109,11 +109,11 @@ export const siteConfig = {
   // homepage ad-unit IDs below were created under this exact publisher.
   adsensePublisherId: "ca-pub-2225877475261768",
 
-  // Manual AdSense ad-unit slot IDs (see src/components/AdSlot.astro,
-  // ported in Phase 5/6). AdSlot renders nothing for an empty string, so
-  // article-page keys stay a safe no-op until Phase 7 designs that
-  // template and real units get created for it (out of scope until then
-  // — see the build plan).
+  // Manual AdSense ad-unit slot IDs (see src/components/AdSlot.astro).
+  // AdSlot renders nothing for an empty string, so the 3 article-page
+  // keys stay a safe no-op until real AdSense units are created for
+  // them — creating those units is outside what this build can do
+  // itself (see the AdSense API research earlier this project).
   adSlots: {
     homepageHeader: "8054858603",
     homepageAfterHero: "9176368583",
@@ -124,11 +124,13 @@ export const siteConfig = {
     homepageAfterAutomobile: "2061808669",
     homepageAfterBigTech: "6492008260",
     homepageAfterStartups: "1238168813",
-    // Article-page positions — proposed in Phase 7 of the build plan,
-    // not yet backed by real AdSense units.
+    // Article-page positions (Phase 7) — not yet backed by real AdSense
+    // units. Three, not bytetech247.com's eight: no pillar-cluster nav,
+    // Quick Answer box, or per-H2 rehype insertion exist on this site's
+    // shorter news-post template, so there's no "mid-body" position to
+    // hang an ad on the way the guides-site original does.
     articleHeader: "",
     articleAfterLead: "",
-    articleMidBody: "",
     articleBeforeRelated: "",
   } as Record<string, string>,
 } as const;
