@@ -1,37 +1,31 @@
 ---
 // Placeholder homepage. Replaced with the real homepage (ticker,
 // asymmetric hero, Popular Now, category rails) in Phase 6 of the build
-// plan. For now this proves BaseLayout, the two-tier header, the
-// weighted footer, and the JSON-LD fork all compile and render
-// together.
+// plan. For now this proves PostCard/HeroTile (Phase 5) render real
+// seed content correctly, on top of BaseLayout/the two-tier header/the
+// weighted footer (Phase 3).
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Stack from "../components/layout/Stack.astro";
 import Grid from "../components/layout/Grid.astro";
-import { CATEGORIES } from "../config";
+import HeroTile from "../components/HeroTile.astro";
+import PostCard from "../components/PostCard.astro";
+
+const allPosts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const [heroPost, ...rest] = allPosts;
 ---
 
 <BaseLayout>
-  <Stack space="6">
+  <Stack space="8">
     <h1>ByteTech247 News</h1>
-    <p>Scaffold in progress — Phase 3 core-shell check.</p>
-    <Grid minItemWidth="10rem" space="3">
-      {
-        CATEGORIES.map((category) => (
-          <div data-category={category.slug} class="category-swatch">
-            {category.name}
-          </div>
-        ))
-      }
+    <p>
+      Scaffold in progress — Phase 5 seed-content check ({allPosts.length} posts).
+    </p>
+    {heroPost && <HeroTile post={heroPost} />}
+    <Grid minItemWidth="18rem" space="4">
+      {rest.slice(0, 8).map((post) => <PostCard post={post} />)}
     </Grid>
   </Stack>
 </BaseLayout>
-
-<style>
-  .category-swatch {
-    border-radius: 0.5rem;
-    padding: 1rem;
-    background-color: var(--card-accent);
-    color: var(--color-accent-fg);
-    font-family: var(--font-display);
-  }
-</style>
