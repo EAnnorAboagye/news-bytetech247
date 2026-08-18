@@ -1,0 +1,84 @@
+---
+// Top tier of the two-tier header (build plan Phase 3, Blueprint
+// artifact) — no bytetech247.com analog. A thin mono-type strip above
+// the main nav bar: tagline on the left, the cross-link back to
+// bytetech247.com and an RSS link on the right. Dark/light toggle
+// already lives in the main nav bar (Header.astro) — not duplicated
+// here.
+---
+
+<div class="utility-strip">
+  <div class="utility-strip__inner">
+    <span class="utility-strip__tagline"
+      >Fast, sourced tech &amp; AI coverage</span
+    >
+    <nav aria-label="Utility" class="utility-strip__links">
+      <a href="https://bytetech247.com" class="utility-strip__link">
+        ByteTech247 <span aria-hidden="true">&rarr;</span>
+      </a>
+      <a href="/rss.xml" class="utility-strip__link">RSS</a>
+    </nav>
+  </div>
+</div>
+
+<style>
+  .utility-strip {
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg-subtle);
+  }
+
+  .utility-strip__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 3);
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: calc(var(--spacing) * 1) calc(var(--spacing) * 4);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-fg-muted);
+  }
+
+  .utility-strip__tagline {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .utility-strip__links {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+    flex-shrink: 0;
+  }
+
+  .utility-strip__link {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 0.5);
+    min-height: 24px;
+    color: var(--color-fg-muted);
+    text-decoration: none;
+  }
+
+  .utility-strip__link:hover {
+    color: var(--color-accent);
+  }
+
+  /* Below the tablet breakpoint the tagline is the first thing worth
+     dropping — the two links (ByteTech247 cross-link, RSS) matter more
+     at any width than the tagline restating what the utility strip
+     already visually is. */
+  @media (max-width: 40rem) {
+    .utility-strip__tagline {
+      display: none;
+    }
+
+    .utility-strip__inner {
+      justify-content: flex-end;
+    }
+  }
+</style>

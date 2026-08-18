@@ -5,10 +5,8 @@
  * instead of letting it get silently appended after `overrides`.
  *
  * Forked from bytetech247.com's global.css architecture (OKLCH tokens,
- * fluid type scale, self-hosted fonts). "components" (ad-slot markup)
- * and "overrides" (.legal prose styling) are added in the phases that
- * actually introduce those templates (Phase 6 and Phase 11 of the build
- * plan) rather than declared speculatively here.
+ * fluid type scale, self-hosted fonts). "overrides" (.legal prose
+ * styling) is added in Phase 11, once trust pages exist to use it.
  */
 @layer theme, reset, tokens, base, components, utilities, overrides;
 
@@ -317,5 +315,41 @@
     summary {
       transition: none;
     }
+  }
+}
+
+@layer components {
+  /*
+   * Maps a category slug (rendered as data-category on an element, e.g.
+   * PrimaryNav's per-category <li>) to that category's accent token, into
+   * one local custom property components can read without six copy-
+   * pasted color rules each. Falls back to the sitewide --color-accent
+   * for any element that doesn't sit inside a categorized element.
+   * Introduced in Phase 3 (PrimaryNav's mega-menu top-border needs it
+   * immediately, not just PostCard/HeroTile in Phase 6) rather than held
+   * back to whichever phase happens to use it first.
+   */
+  [data-category="ai-news"] {
+    --card-accent: var(--category-accent-ai-news);
+  }
+
+  [data-category="software-news"] {
+    --card-accent: var(--category-accent-software-news);
+  }
+
+  [data-category="electronics"] {
+    --card-accent: var(--category-accent-electronics);
+  }
+
+  [data-category="automobile"] {
+    --card-accent: var(--category-accent-automobile);
+  }
+
+  [data-category="big-tech"] {
+    --card-accent: var(--category-accent-big-tech);
+  }
+
+  [data-category="startups"] {
+    --card-accent: var(--category-accent-startups);
   }
 }

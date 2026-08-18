@@ -1,43 +1,37 @@
 ---
 // Placeholder homepage. Replaced with the real homepage (ticker,
 // asymmetric hero, Popular Now, category rails) in Phase 6 of the build
-// plan, once BaseLayout (Phase 3) exists. For now this just proves
-// Phase 2's token stylesheet and layout primitives compile and render
+// plan. For now this proves BaseLayout, the two-tier header, the
+// weighted footer, and the JSON-LD fork all compile and render
 // together.
-import "../styles/global.css";
-import Center from "../components/layout/Center.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import Stack from "../components/layout/Stack.astro";
 import Grid from "../components/layout/Grid.astro";
 import { CATEGORIES } from "../config";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ByteTech247 News</title>
-  </head>
-  <body>
-    <Center>
-      <Stack space="6">
-        <h1>ByteTech247 News</h1>
-        <p>Scaffold in progress — Phase 2 token/primitive check.</p>
-        <Grid minItemWidth="10rem" space="3">
-          {
-            /* References --category-accent-* directly rather than the
-               --card-accent indirection PostCard.astro will use — that
-               data-category mapping is a Phase 6 concern, not Phase 2's. */
-            CATEGORIES.map((category) => (
-              <div
-                style={`border-radius:0.5rem;padding:1rem;background-color:var(--category-accent-${category.slug});color:var(--color-accent-fg);font-family:var(--font-display);`}
-              >
-                {category.name}
-              </div>
-            ))
-          }
-        </Grid>
-      </Stack>
-    </Center>
-  </body>
-</html>
+<BaseLayout>
+  <Stack space="6">
+    <h1>ByteTech247 News</h1>
+    <p>Scaffold in progress — Phase 3 core-shell check.</p>
+    <Grid minItemWidth="10rem" space="3">
+      {
+        CATEGORIES.map((category) => (
+          <div data-category={category.slug} class="category-swatch">
+            {category.name}
+          </div>
+        ))
+      }
+    </Grid>
+  </Stack>
+</BaseLayout>
+
+<style>
+  .category-swatch {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: var(--card-accent);
+    color: var(--color-accent-fg);
+    font-family: var(--font-display);
+  }
+</style>

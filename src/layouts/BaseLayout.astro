@@ -1,0 +1,331 @@
+---
+// Forked from bytetech247.com's BaseLayout.astro (build plan Phase 3).
+// Structurally identical — Trusted Types policy, gtag/Consent Mode v2,
+// Cloudflare Web Analytics beacon, AdSense loader + activation delegate,
+// dark-mode FOUC-avoidance script, full meta/OG/Twitter/canonical/robots
+// pipeline, jsonLd array rendering, data-pagefind-body wrapper, focus
+// management — with two real differences: gtag and the CF beacon are
+// gated behind their config values being non-empty (analyticsId and
+// cloudflareBeaconToken are both "" until a real GA4 property / Web
+// Analytics site exists for this domain — see src/config.ts), so this
+// site doesn't fire broken analytics requests with an empty ID in the
+// meantime. The google-site-verification meta tag is dropped entirely
+// until a Search Console property exists for this domain (Phase 13) —
+// bytetech247.com's own verification code would not verify this domain
+// and shouldn't be reused.
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
+import { siteConfig } from "../config";
+import { siteWideJsonLd, absoluteUrl } from "../lib/json-ld";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import CommandPalette from "../components/CommandPalette.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  showReadingProgress?: boolean;
+  /** Absolute OG/Twitter image URL. Defaults to siteConfig.defaultOgImage. */
+  image?: string;
+  /** og:type — "article" on post pages, "website" everywhere else. */
+  type?: "website" | "article";
+  /**
+   * Page-specific JSON-LD (e.g. NewsArticle + BreadcrumbList from the
+   * article template). Site-wide WebSite/NewsMediaOrganization blocks
+   * are always injected on top of this, not instead of it.
+   */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Root-relative URL of the page's LCP image, preloaded if given. */
+  preloadImage?: string;
+  /** Absolute URL of the post's plain-Markdown export, if any. */
+  markdownUrl?: string;
+  /**
+   * Set on tag pages, /archive/, and legal/about pages — Google should
+   * only index category pages and posts, not these navigation/utility
+   * pages. `follow` (not a bare `noindex`) so link equity still flows
+   * through them to the posts they list/link to.
+   */
+  noindex?: boolean;
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  showReadingProgress = false,
+  image = siteConfig.defaultOgImage ?? undefined,
+  type = "website",
+  jsonLd,
+  preloadImage,
+  markdownUrl,
+  noindex = false,
+} = Astro.props;
+
+// Computed per-page, not a sitewide constant — every page needs its own
+// canonical URL.
+const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).href;
+const absoluteImage = image ? absoluteUrl(image) : undefined;
+
+const jsonLdBlocks = [
+  ...siteWideJsonLd(),
+  ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []),
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- Trusted Types default policy — required for Astro's own ClientRouter
+         to function under this page's require-trusted-types-for 'script'
+         CSP directive (applyCsp()/cspFor() in worker/index.ts, added in
+         Phase 4). Must run before <ClientRouter /> attaches its
+         navigation listeners, so it's the very first script in <head>. -->
+    <script is:inline>
+      if (window.trustedTypes?.createPolicy) {
+        window.trustedTypes.createPolicy("default", {
+          createHTML: (html) => html,
+          createScript: (script) => script,
+          createScriptURL: (url) => url,
+        });
+      }
+    </script>
+    <!-- Unconditionally rendered (rather than wrapped in a template
+         {condition && (<script>...)} block — that pattern reliably broke
+         prettier-plugin-astro's parser on this specific script's content,
+         a formatting-only failure, not a build one) with the actual gate
+         inside the script itself: analyticsId is "" until a real GA4
+         property exists for this domain (src/config.ts), and every call
+         below is a no-op against an empty ID, so guarding at the top
+         keeps this from firing a single network request in the
+         meantime. -->
+    <script define:vars={{ analyticsId: siteConfig.analyticsId }}>
+      if (analyticsId) {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function (...args) {
+          window.dataLayer.push(args);
+        };
+        window.gtag("consent", "default", {
+          ad_storage: "denied",
+          analytics_storage: "granted",
+          ad_user_data: "denied",
+          ad_personalization: "denied",
+        });
+        window.gtag("js", new Date());
+        window.gtag("config", analyticsId, { send_page_view: false });
+
+        document.addEventListener("astro:page-load", () => {
+          window.gtag("event", "page_view", {
+            page_location: window.location.href,
+            page_path: window.location.pathname,
+            page_title: document.title,
+          });
+        });
+
+        window.addEventListener("load", () => {
+          const gtagSrc = `https://www.googletagmanager.com/gtag/js?id=${analyticsId}`;
+          const scriptUrl = window.trustedTypes
+            ? window.trustedTypes
+                .createPolicy("gtag-loader", {
+                  createScriptURL: (url) =>
+                    url === gtagSrc ? url : "about:blank",
+                })
+                .createScriptURL(gtagSrc)
+            : gtagSrc;
+          const script = document.createElement("script");
+          script.async = true;
+          script.fetchPriority = "low";
+          script.src = scriptUrl;
+          document.head.appendChild(script);
+        });
+      }
+    </script>
+    {
+      siteConfig.cloudflareBeaconToken && (
+        <script
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({
+            token: siteConfig.cloudflareBeaconToken,
+          })}
+        />
+      )
+    }
+    <!-- Google AdSense loader — same account as bytetech247.com
+         (siteConfig.adsensePublisherId), enables the 9 real homepage ad
+         units created for this site. ad_storage/ad_user_data/
+         ad_personalization stay denied (non-personalized ads only) until
+         this site has a real Consent Management Platform. -->
+    <script
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsensePublisherId}`}
+      crossorigin="anonymous"></script>
+    <!-- Activates every manually-placed ad slot on the page. is:inline:
+         window.adsbygoogle is an untyped third-party global. -->
+    <script is:inline>
+      document.addEventListener("astro:page-load", () => {
+        const unfilled = document.querySelectorAll(
+          "ins.adsbygoogle:not([data-adsbygoogle-status])",
+        );
+        for (let i = 0; i < unfilled.length; i++) {
+          try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } catch {
+            // AdSense script blocked (ad blocker, offline, not yet
+            // approved) — every slot's reserved min-height keeps layout
+            // stable either way.
+          }
+        }
+      });
+    </script>
+    <script is:inline>
+      // Dark mode, applied before first paint to avoid a flash of the
+      // wrong theme — a manually-saved preference wins, otherwise this
+      // follows the system preference. Re-applied on "astro:after-swap"
+      // (not just once at parse time) so a saved preference keeps
+      // applying after a ClientRouter navigation swaps in new content.
+      function applyStoredTheme() {
+        const stored = localStorage.getItem("theme");
+        const theme =
+          stored ??
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      }
+      applyStoredTheme();
+      document.addEventListener("astro:after-swap", applyStoredTheme);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonicalUrl} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={siteConfig.name}
+      href={`${siteConfig.url}/rss.xml`}
+    />
+    {
+      markdownUrl && (
+        <link rel="alternate" type="text/markdown" href={markdownUrl} />
+      )
+    }
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#8B3B38" />
+
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    {absoluteImage && <meta property="og:image" content={absoluteImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {absoluteImage && <meta name="twitter:image" content={absoluteImage} />}
+
+    {
+      preloadImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={preloadImage}
+          fetchpriority="high"
+        />
+      )
+    }
+
+    {
+      jsonLdBlocks.map((block) => (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(block).replace(/</g, "\\u003c")}
+        />
+      ))
+    }
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <Header />
+
+    {showReadingProgress && <div class="reading-progress" aria-hidden="true" />}
+
+    <main id="main-content" tabindex="-1" data-pagefind-body>
+      <slot />
+    </main>
+
+    <Footer />
+
+    <CommandPalette />
+
+    <script>
+      // Astro's View Transitions swap content client-side, and can leave
+      // focus stranded on a now-detached element. Move focus to the new
+      // page's heading so screen reader users get proper context after
+      // every navigation.
+      document.addEventListener("astro:page-load", () => {
+        const heading = document.querySelector<HTMLElement>("main h1");
+        if (!heading) return;
+        if (!heading.hasAttribute("tabindex")) {
+          heading.setAttribute("tabindex", "-1");
+        }
+        heading.focus();
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: var(--spacing);
+    z-index: 100;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+    background-color: var(--color-accent);
+    color: var(--color-accent-fg);
+    border-radius: 0.375rem;
+    text-decoration: none;
+  }
+
+  .skip-link:focus {
+    top: var(--spacing);
+  }
+
+  .reading-progress {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: 3px;
+    background-color: var(--color-accent);
+    transform-origin: left;
+    transform: scaleX(0);
+    animation: reading-progress-fill linear;
+    animation-timeline: scroll(root);
+  }
+
+  @keyframes reading-progress-fill {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading-progress {
+      animation: none;
+      transform: scaleX(0);
+    }
+  }
+</style>

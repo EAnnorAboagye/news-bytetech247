@@ -1,0 +1,227 @@
+---
+// Weighted 4-column footer (build plan Phase 3, Blueprint artifact) —
+// a wide brand column plus 3 even link columns, not bytetech247.com's
+// flat auto-fit Grid (5 equal columns including a Tools column this
+// site doesn't have). Forked structurally from bytetech247.com's
+// Footer.astro (social icon rendering, nav-list markup) but with a
+// hand-written grid-template-columns override, same technique the
+// homepage's own featured-card row already uses to break out of the
+// generic Grid primitive's equal-column default.
+import { siFacebook, siInstagram, siTiktok, siX } from "simple-icons";
+import { siteConfig, CATEGORIES } from "../config";
+
+const year = new Date().getFullYear();
+const socialLinks = Object.entries(siteConfig.social);
+
+const SOCIAL_ICONS: Record<string, string> = {
+  facebook: `<path d="${siFacebook.path}" fill="currentColor"/>`,
+  x: `<path d="${siX.path}" fill="currentColor"/>`,
+  instagram: `<path d="${siInstagram.path}" fill="currentColor"/>`,
+  tiktok: `<path d="${siTiktok.path}" fill="currentColor"/>`,
+};
+const SOCIAL_LABELS: Record<string, string> = {
+  facebook: "Facebook",
+  x: "X",
+  instagram: "Instagram",
+  tiktok: "TikTok",
+};
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <p class="site-footer__site-name">{siteConfig.name}</p>
+        <p class="site-footer__description">{siteConfig.description}</p>
+        {
+          socialLinks.length > 0 && (
+            <div class="site-footer__social">
+              <p class="site-footer__heading">Social handles</p>
+              <ul class="site-footer__social-list">
+                {socialLinks.map(([platform, href]) => (
+                  <li>
+                    <a href={href} class="site-footer__social-link">
+                      <span
+                        class="site-footer__social-icon"
+                        aria-hidden="true"
+                        set:html={`<svg viewBox="0 0 24 24" width="18" height="18">${SOCIAL_ICONS[platform] ?? ""}</svg>`}
+                      />
+                      {SOCIAL_LABELS[platform] ?? platform}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+
+      <nav aria-label="Categories" class="site-footer__col">
+        <p class="site-footer__heading">Categories</p>
+        <ul class="site-footer__list">
+          {
+            CATEGORIES.map((category) => (
+              <li>
+                <a href={`/${category.slug}/`}>{category.name}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav aria-label="Company" class="site-footer__col">
+        <p class="site-footer__heading">Company</p>
+        <ul class="site-footer__list">
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-label="Legal and resources" class="site-footer__col">
+        <p class="site-footer__heading">Legal &amp; Resources</p>
+        <ul class="site-footer__list">
+          <li><a href="/privacy/">Privacy</a></li>
+          <li><a href="/terms/">Terms &amp; Conditions</a></li>
+          <li><a href="/editorial-policy/">Editorial Policy</a></li>
+          <li><a href="/archive/">All posts</a></li>
+          <li><a href="/rss.xml">RSS feed</a></li>
+          <li><a href="/sitemap.xml">Sitemap</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <p class="site-footer__copyright">&copy; {year} {siteConfig.name}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-subtle);
+  }
+
+  .site-footer__inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: calc(var(--spacing) * 6) calc(var(--spacing) * 4);
+  }
+
+  /* Weighted 4-col: wide brand column, then 3 even link columns. Same
+     hand-override technique as index.astro's homepage grid (Phase 6) —
+     a fixed grid-template-columns on top of the generic layout system,
+     because this is the one row on the page that deliberately isn't
+     evenly weighted. */
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: calc(var(--spacing) * 6);
+  }
+
+  @media (max-width: 48rem) {
+    .site-footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (min-width: 48.01rem) and (max-width: 64rem) {
+    .site-footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .site-footer__brand {
+      grid-column: span 2;
+    }
+  }
+
+  .site-footer__site-name {
+    font-weight: 700;
+    color: var(--color-fg);
+  }
+
+  .site-footer__description,
+  .site-footer__heading {
+    font-size: var(--text-sm);
+  }
+
+  .site-footer__heading {
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+
+  .site-footer__description {
+    color: var(--color-fg-muted);
+  }
+
+  .site-footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .site-footer__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.5);
+  }
+
+  .site-footer__list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding-block: calc(var(--spacing) * 0.25);
+    color: var(--color-fg-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  .site-footer__list a:hover {
+    color: var(--color-accent);
+  }
+
+  .site-footer__social {
+    margin-top: calc(var(--spacing) * 2);
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .site-footer__social-list {
+    list-style: none;
+    margin: calc(var(--spacing) * 1) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.5);
+  }
+
+  .site-footer__social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1.5);
+    min-height: 24px;
+    color: var(--color-fg-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+
+  .site-footer__social-link:hover {
+    color: var(--color-accent);
+  }
+
+  .site-footer__social-icon {
+    display: inline-flex;
+    color: currentColor;
+    flex-shrink: 0;
+  }
+
+  .site-footer__copyright {
+    margin-top: calc(var(--spacing) * 6);
+    padding-top: calc(var(--spacing) * 4);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+  }
+</style>

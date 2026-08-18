@@ -1,0 +1,240 @@
+---
+// Rendered twice by Header.astro (mobile disclosure + desktop nav) — both
+// copies stay in the DOM for CSS-only responsive show/hide. Forked from
+// bytetech247.com's PrimaryNav.astro: drops the Tools dropdown (no
+// /tools/ section on this site) and trims the vertical-only legal
+// dropdown to the three trust pages this site actually has (Phase 11 —
+// no separate affiliate-disclosure page; ownership/funding transparency
+// lives inside /about/ instead).
+//
+// Order: Home, each category (own tag-dropdown) — vertical (mobile/
+// tablet hamburger) only — About, Contact, Privacy (dropdown listing
+// every legal page). The horizontal (desktop) nav stops at the
+// categories: About/Contact/legal pages are one click away in the
+// footer and (once Phase 10 ships) in the command palette's static-page
+// jump list, so the wide-viewport nav doesn't need to duplicate them.
+//
+// The category name and "Privacy" label in <summary> are deliberately
+// plain text, not a nested <a> — nesting an interactive link inside the
+// native disclosure trigger is a real accessibility anti-pattern
+// (ambiguous activation behavior for assistive tech, axe-core's
+// nested-interactive rule).
+//
+// Every <details> here closes on outside click / Escape via the shared
+// script in Header.astro, not locally.
+import { CATEGORIES, getCategoryName, type CategorySlug } from "../config";
+import { slugifyTag } from "../lib/taxonomy";
+
+interface Props {
+  topTagsByCategory: Record<CategorySlug, string[]>;
+  variant?: "horizontal" | "vertical";
+}
+
+const { topTagsByCategory, variant = "vertical" } = Astro.props;
+
+const legalLinks = [
+  { label: "Privacy Policy", href: "/privacy/" },
+  { label: "Terms & Conditions", href: "/terms/" },
+  { label: "Editorial Policy", href: "/editorial-policy/" },
+];
+---
+
+<ul class:list={["primary-nav", `primary-nav--${variant}`]}>
+  <li>
+    <a href="/" class="primary-nav__link">Home</a>
+  </li>
+
+  {
+    CATEGORIES.map((category) => (
+      <li data-category={category.slug}>
+        <details class="primary-nav__dropdown">
+          <summary>
+            {category.name} <span aria-hidden="true">&#9662;</span>
+          </summary>
+          <div class="primary-nav__panel">
+            <ul class="primary-nav__tags">
+              {topTagsByCategory[category.slug].map((tag) => (
+                <li>
+                  <a href={`/tag/${slugifyTag(tag)}/`} class="primary-nav__tag">
+                    {tag}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a href={`/${category.slug}/`} class="primary-nav__view-all">
+              View all in {getCategoryName(category.slug)}
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </details>
+      </li>
+    ))
+  }
+
+  {
+    variant === "vertical" && (
+      <>
+        <li>
+          <a href="/about/" class="primary-nav__link">
+            About
+          </a>
+        </li>
+        <li>
+          <a href="/contact/" class="primary-nav__link">
+            Contact
+          </a>
+        </li>
+
+        <li>
+          <details class="primary-nav__dropdown">
+            <summary>
+              Privacy <span aria-hidden="true">&#9662;</span>
+            </summary>
+            <ul class="primary-nav__panel">
+              {legalLinks.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </li>
+      </>
+    )
+  }
+</ul>
+
+<style>
+  .primary-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .primary-nav__link,
+  .primary-nav > li > details > summary {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 0.5);
+    min-height: 24px;
+    padding: calc(var(--spacing) * 0.5) 0;
+    cursor: pointer;
+    list-style: none;
+    color: var(--color-fg);
+  }
+
+  .primary-nav__link {
+    text-decoration: none;
+    cursor: default;
+  }
+
+  .primary-nav > li > details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .primary-nav a {
+    color: var(--color-fg);
+    text-decoration: none;
+  }
+
+  .primary-nav__link:hover,
+  .primary-nav a:hover {
+    color: var(--color-accent);
+  }
+
+  .primary-nav details[open] > summary {
+    color: var(--color-accent);
+  }
+
+  .primary-nav__panel {
+    list-style: none;
+    margin: 0;
+    padding: var(--spacing);
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.5);
+  }
+
+  .primary-nav__panel a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: calc(var(--spacing) * 0.5) 0;
+  }
+
+  .primary-nav__tags {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.5);
+  }
+
+  .primary-nav__tag {
+    color: var(--color-fg-muted);
+    font-size: var(--text-sm);
+  }
+
+  .primary-nav__panel .primary-nav__view-all {
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 1);
+    margin-top: calc(var(--spacing) * 1);
+    padding-top: calc(var(--spacing) * 1.5);
+    border-top: 1px solid var(--color-border);
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .primary-nav--horizontal {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: calc(var(--spacing) * 3);
+  }
+
+  .primary-nav--horizontal > li {
+    position: relative;
+  }
+
+  .primary-nav--horizontal .primary-nav__panel {
+    position: absolute;
+    top: calc(100% + calc(var(--spacing) * 1));
+    left: 0;
+    min-width: 20rem;
+    padding: calc(var(--spacing) * 3);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--card-accent, var(--color-accent));
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-card-hover);
+    z-index: 10;
+    animation: primary-nav-panel-in var(--duration-base) var(--ease-out-expo);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .primary-nav--horizontal .primary-nav__panel {
+      animation: none;
+    }
+  }
+
+  @keyframes primary-nav-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .primary-nav--horizontal .primary-nav__tags {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(7rem, 1fr));
+    gap: calc(var(--spacing) * 0.5) calc(var(--spacing) * 3);
+  }
+</style>
