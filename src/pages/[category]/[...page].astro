@@ -55,6 +55,18 @@ const { page } = Astro.props;
 const categoryName = getCategoryName(category);
 const description = getCategoryDescription(category);
 
+// Astro's paginate() generates page.url.prev/next WITHOUT a trailing
+// slash (e.g. "/ai-news/2", "/ai-news" for page 1) — every other
+// internal link on this site already points straight at the real
+// trailing-slash URL, so leaving these as-is would make pagination the
+// one link on the site that relies on an extra 301 round trip instead
+// of linking directly to the canonical URL. Caught live by Phase 12's
+// e2e pagination suite.
+const withTrailingSlash = (url: string | undefined) =>
+  url && !url.endsWith("/") ? `${url}/` : url;
+const prevUrl = withTrailingSlash(page.url.prev);
+const nextUrl = withTrailingSlash(page.url.next);
+
 const pageUrl = new URL(Astro.url.pathname, siteConfig.url).href;
 const categoryUrl = new URL(`/${category}/`, siteConfig.url).href;
 const jsonLdBlocks = [
@@ -103,8 +115,8 @@ const title =
   {
     page.lastPage > 1 && (
       <nav aria-label="Pagination" class="pagination">
-        {page.url.prev ? (
-          <a href={page.url.prev} class="pagination__link">
+        {prevUrl ? (
+          <a href={prevUrl} class="pagination__link">
             ← Newer
           </a>
         ) : (
@@ -113,8 +125,8 @@ const title =
         <span class="pagination__status">
           Page {page.currentPage} of {page.lastPage}
         </span>
-        {page.url.next ? (
-          <a href={page.url.next} class="pagination__link">
+        {nextUrl ? (
+          <a href={nextUrl} class="pagination__link">
             Older →
           </a>
         ) : (

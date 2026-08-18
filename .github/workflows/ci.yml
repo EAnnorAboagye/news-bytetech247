@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # getLastVerifiedDate() reads each post's last-touching commit date
+      # via `git log`, which silently returns nothing for a shallow
+      # clone once a file's real last-touching commit is older than
+      # whatever depth was fetched — full history, not the default
+      # shallow clone.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Astro check
+        run: npm run check
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E + accessibility tests
+        run: npm run test:e2e
+
+      - name: Lighthouse CI (mobile preset)
+        run: npx @lhci/cli@0.13.x autorun --config=.lighthouserc.json
+
+  deploy:
+    # CI builds then deploys via `wrangler deploy` as an explicit step —
+    # there is no Pages project to auto-build on push. Requires
+    # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repo secrets
+    # (Settings -> Secrets and variables -> Actions) before this job can
+    # actually deploy; it will fail loudly without them rather than
+    # silently no-op.
+    #
+    # GOOGLE_INDEXING_SERVICE_ACCOUNT (optional, separate secret) enables
+    # scripts/submit-google-indexing.mjs — the whole downloaded service-
+    # account JSON key as one secret value. Without it, that step logs a
+    # skip message and the deploy still succeeds.
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: Submit URLs to IndexNow
+        run: node scripts/submit-indexnow.mjs
+
+      - name: Submit URLs to Google Indexing API
+        env:
+          GOOGLE_INDEXING_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_INDEXING_SERVICE_ACCOUNT }}
+        run: node scripts/submit-google-indexing.mjs

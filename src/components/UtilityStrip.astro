@@ -5,9 +5,16 @@
 // bytetech247.com and an RSS link on the right. Dark/light toggle
 // already lives in the main nav bar (Header.astro) — not duplicated
 // here.
+//
+// role="region" + aria-label on the root — caught live by Phase 12's
+// e2e a11y suite (axe-core's "region" rule): the tagline span is plain
+// text sitting next to (not inside) the <nav> below it, so without this
+// it was real page content not contained by any landmark. Kept as a
+// sibling of the <nav>, not merged into it — a tagline isn't
+// navigation — this just gives the whole strip its own landmark instead.
 ---
 
-<div class="utility-strip">
+<div class="utility-strip" role="region" aria-label="Site utilities">
   <div class="utility-strip__inner">
     <span class="utility-strip__tagline"
       >Fast, sourced tech &amp; AI coverage</span

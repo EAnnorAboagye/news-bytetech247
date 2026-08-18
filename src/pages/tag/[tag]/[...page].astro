@@ -49,6 +49,13 @@ export const getStaticPaths = (async ({ paginate }) => {
 const { display, page } = Astro.props;
 const description = `Posts tagged "${display}" on ${siteConfig.name}.`;
 
+// Same trailing-slash fix as the category archive's pagination — see
+// that file's comment.
+const withTrailingSlash = (url: string | undefined) =>
+  url && !url.endsWith("/") ? `${url}/` : url;
+const prevUrl = withTrailingSlash(page.url.prev);
+const nextUrl = withTrailingSlash(page.url.next);
+
 const pageUrl = new URL(Astro.url.pathname, siteConfig.url).href;
 const tagUrl = new URL(`/tag/${Astro.params.tag}/`, siteConfig.url).href;
 const jsonLdBlocks = [
@@ -79,19 +86,32 @@ const title =
       page.data.length === 0 ? (
         <p>No posts yet with this tag.</p>
       ) : (
-        <div class="tag-grid">
-          {page.data.map((post, index) => (
-            <PostCard post={post} eager={index < 4} />
-          ))}
-        </div>
+        <>
+          {
+            // A real h2 before the grid, not just the h1 — caught live
+            // by Phase 12's e2e a11y suite (axe-core's "heading-order"
+            // rule): PostCard's own <h3> immediately after this page's
+            // <h1> skipped a level with nothing to catch it.
+          }
+          <h2 class="section-heading">
+            {page.currentPage === 1
+              ? "All posts"
+              : `Page ${page.currentPage} of ${page.lastPage}`}
+          </h2>
+          <div class="tag-grid">
+            {page.data.map((post, index) => (
+              <PostCard post={post} eager={index < 4} />
+            ))}
+          </div>
+        </>
       )
     }
 
     {
       page.lastPage > 1 && (
         <nav aria-label="Pagination" class="pagination">
-          {page.url.prev ? (
-            <a href={page.url.prev} class="pagination__link">
+          {prevUrl ? (
+            <a href={prevUrl} class="pagination__link">
               ← Newer
             </a>
           ) : (
@@ -100,8 +120,8 @@ const title =
           <span class="pagination__status">
             Page {page.currentPage} of {page.lastPage}
           </span>
-          {page.url.next ? (
-            <a href={page.url.next} class="pagination__link">
+          {nextUrl ? (
+            <a href={nextUrl} class="pagination__link">
               Older →
             </a>
           ) : (
@@ -120,8 +140,14 @@ const title =
     min-height: 24px;
   }
 
-  .tag-grid {
+  .section-heading {
+    font-size: var(--text-2xl);
     margin-top: calc(var(--spacing) * 6);
+    margin-bottom: calc(var(--spacing) * 4);
+    color: var(--color-fg);
+  }
+
+  .tag-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: calc(var(--spacing) * 4);

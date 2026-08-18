@@ -1,0 +1,27 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "./dist",
+      "url": [
+        "http://localhost/index.html",
+        "http://localhost/ai-news/index.html",
+        "http://localhost/ai-news/gpt-6-preview-launches-with-agent-mode/index.html",
+        "http://localhost/tag/openai/index.html",
+        "http://localhost/about/index.html",
+        "http://localhost/archive/index.html"
+      ],
+      "numberOfRuns": 5
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.8 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 3000 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+        "total-blocking-time": ["warn", { "maxNumericValue": 300 }]
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
