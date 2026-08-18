@@ -162,28 +162,39 @@ const jsonLdBlocks = [
          (siteConfig.adsensePublisherId), enables the 9 real homepage ad
          units created for this site. ad_storage/ad_user_data/
          ad_personalization stay denied (non-personalized ads only) until
-         this site has a real Consent Management Platform. -->
-    <script
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsensePublisherId}`}
-      crossorigin="anonymous"></script>
+         this site has a real Consent Management Platform.
+         Gated on siteConfig.adsenseApproved — see that field's own
+         comment for why loading this script at all, pre-approval, is a
+         confirmed CLS bug, not just a revenue no-op. AdSlot.astro's
+         reserved min-height still renders either way, so the layout
+         doesn't change once this flips true. -->
+    {
+      siteConfig.adsenseApproved && (
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsensePublisherId}`}
+          crossorigin="anonymous"
+        />
+      )
+    }
     <!-- Activates every manually-placed ad slot on the page. is:inline:
          window.adsbygoogle is an untyped third-party global. -->
-    <script is:inline>
-      document.addEventListener("astro:page-load", () => {
-        const unfilled = document.querySelectorAll(
-          "ins.adsbygoogle:not([data-adsbygoogle-status])",
-        );
-        for (let i = 0; i < unfilled.length; i++) {
-          try {
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-          } catch {
-            // AdSense script blocked (ad blocker, offline, not yet
-            // approved) — every slot's reserved min-height keeps layout
-            // stable either way.
+    <script define:vars={{ adsenseApproved: siteConfig.adsenseApproved }}>
+      if (adsenseApproved) {
+        document.addEventListener("astro:page-load", () => {
+          const unfilled = document.querySelectorAll(
+            "ins.adsbygoogle:not([data-adsbygoogle-status])",
+          );
+          for (let i = 0; i < unfilled.length; i++) {
+            try {
+              (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch {
+              // AdSense script blocked (ad blocker, offline) — every
+              // slot's reserved min-height keeps layout stable either way.
+            }
           }
-        }
-      });
+        });
+      }
     </script>
     <script is:inline>
       // Dark mode, applied before first paint to avoid a flash of the

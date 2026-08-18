@@ -109,6 +109,20 @@ export const siteConfig = {
   // homepage ad-unit IDs below were created under this exact publisher.
   adsensePublisherId: "ca-pub-2225877475261768",
 
+  // Flip to true once AdSense shows this domain as connected/approved.
+  // Until then, BaseLayout doesn't load adsbygoogle.js or activate any
+  // slot at all — not just a revenue no-op, but a real CLS bug: an
+  // unapproved/unfilled slot's data-ad-format="auto" +
+  // data-full-width-responsive="true" still resizes the <ins> element
+  // asynchronously on astro:page-load (after initial layout), and that
+  // resize can exceed the CSS min-height reserved for it. Confirmed via
+  // a live CI run — Lighthouse measured 0.2565 CLS on the homepage
+  // (9 stacked slots, one right at the top) against a 0.1 budget,
+  // identically on two separate commits that touched nothing about the
+  // homepage. AdSlot.astro's own comment assumed reserved min-height was
+  // sufficient on its own; it isn't, once the script actually runs.
+  adsenseApproved: false,
+
   // Manual AdSense ad-unit slot IDs (see src/components/AdSlot.astro).
   // AdSlot renders nothing for an empty string, so the 3 article-page
   // keys stay a safe no-op until real AdSense units are created for
