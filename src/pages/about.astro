@@ -1,0 +1,91 @@
+---
+// Masthead (build plan Phase 11). Forked structurally from
+// bytetech247.com's about.astro — content pillars, founder/editor
+// identity, AuthorBio, personJsonLd() — plus a new "Ownership & funding"
+// section folded in here rather than a separate page, per the build
+// plan (bytetech247.com's affiliate-disclosure.astro isn't ported;
+// its one substantive point, that this site runs AdSense and nothing
+// else, lives here instead). NOT noindex — every article's Person
+// JSON-LD points here as the authority behind the content, so this page
+// has to stay indexable.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import AuthorBio from "../components/AuthorBio.astro";
+import { siteConfig } from "../config";
+import { personJsonLd } from "../lib/json-ld";
+---
+
+<BaseLayout
+  title={`About — ${siteConfig.name}`}
+  description={`About ${siteConfig.name}: ${siteConfig.description}`}
+  jsonLd={personJsonLd()}
+>
+  <article class="legal">
+    <h1>About</h1>
+    <p>
+      {siteConfig.name} covers what's actually moving in tech right now — model releases,
+      product launches, big-tech leadership and earnings, startup funding, and the
+      hardware and automotive stories worth knowing about the day they happen. It's
+      the news-focused sibling to{" "}
+      <a href="https://bytetech247.com">bytetech247.com</a>, which covers dev
+      tools, automation, and AI productivity as long-form guides — this site is
+      where the same team covers what happened today, not how to do something.
+    </p>
+
+    <p>Six categories, each for a different kind of story:</p>
+    <ul>
+      <li>
+        <strong>AI News</strong> — model releases, lab announcements, AI policy.
+      </li>
+      <li>
+        <strong>Software News</strong> — product launches, major updates, dev-platform
+        changes.
+      </li>
+      <li>
+        <strong>Tech Electronics</strong> — hardware and gadget news, launches and
+        events.
+      </li>
+      <li>
+        <strong>Tech Automobile</strong> — EVs, autonomous driving, automotive software.
+      </li>
+      <li>
+        <strong>Big Tech &amp; Industry Moves</strong> — leadership, acquisitions,
+        earnings.
+      </li>
+      <li>
+        <strong>Startups &amp; Funding</strong> — rounds, launches, and acquisitions
+        in the startup layer.
+      </li>
+    </ul>
+
+    <h2>Who's behind it</h2>
+    <p>
+      {siteConfig.name} is founded and edited by {siteConfig.author.name}, who
+      also founded and edits{" "}
+      <a href="https://bytetech247.com">bytetech247.com</a>. Every story
+      published here is written, sourced, and reviewed before it goes live — see
+      the <a href="/editorial-policy/">Editorial Policy</a>{" "}
+      for exactly how.
+    </p>
+
+    <AuthorBio />
+
+    <h2>Ownership &amp; funding</h2>
+    <p>
+      {siteConfig.name} is independently owned and operated by{" "}
+      {siteConfig.author.name}; it is not owned by, or affiliated with, any
+      larger media company, publisher, or outside investor. Revenue comes from
+      Google AdSense — display ads, non-personalized by default for every
+      visitor (see the{" "}
+      <a href="/privacy/">Privacy Policy</a> for how ad consent is handled). This
+      site does not currently run affiliate links or sponsored posts, and nobody has
+      paid for coverage or placement. If that changes, this section will be updated
+      first, before anything goes live, and any sponsored content will be clearly
+      labeled as such — never blended into regular editorial content.
+    </p>
+
+    <p>
+      Spotted something outdated, or have a tip worth covering?{" "}
+      <a href="/contact/">Get in touch</a>.
+    </p>
+  </article>
+</BaseLayout>

@@ -5,8 +5,7 @@
  * instead of letting it get silently appended after `overrides`.
  *
  * Forked from bytetech247.com's global.css architecture (OKLCH tokens,
- * fluid type scale, self-hosted fonts). "overrides" (.legal prose
- * styling) is added in Phase 11, once trust pages exist to use it.
+ * fluid type scale, self-hosted fonts).
  */
 @layer theme, reset, tokens, base, components, utilities, overrides;
 
@@ -408,6 +407,108 @@
   @media (min-width: 40rem) {
     .ad-slot[data-ad-size="rectangle"] {
       min-height: 250px;
+    }
+  }
+}
+
+@layer overrides {
+  /*
+   * Shared prose treatment for the standalone content pages (About,
+   * Contact, Privacy, Terms, Editorial Policy) — every one wraps its
+   * content in <article class="legal">. Ported verbatim from
+   * bytetech247.com, held back until Phase 11 actually introduces those
+   * pages rather than declared speculatively earlier.
+   */
+  .legal {
+    max-width: 42rem;
+    margin-inline: auto;
+    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+    line-height: 1.7;
+  }
+
+  .legal > :first-child {
+    margin-top: 0;
+  }
+
+  .legal h1 {
+    font-family: var(--font-serif);
+    letter-spacing: normal;
+    margin: 0 0 0.5em;
+  }
+
+  .legal h2,
+  .legal h3 {
+    font-family: var(--font-serif);
+    letter-spacing: normal;
+  }
+
+  .legal h2 {
+    margin: 2.5em 0 1em;
+  }
+
+  .legal h3 {
+    margin: 2em 0 0.75em;
+  }
+
+  .legal p {
+    margin: 0 0 1.25em;
+  }
+
+  .legal ul,
+  .legal ol {
+    margin: 0 0 1.25em;
+    padding-inline-start: 1.5em;
+  }
+
+  .legal li {
+    margin-top: 0.4em;
+  }
+
+  .legal a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .legal a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .legal__updated {
+    margin: 0 0 1.5em;
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+  }
+
+  .legal__disclaimer {
+    margin-top: calc(var(--spacing) * 8);
+    padding-top: calc(var(--spacing) * 4);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+  }
+
+  @media print {
+    .site-header,
+    .site-footer,
+    .command-palette,
+    .skip-link,
+    .reading-progress,
+    .breadcrumb,
+    [data-command-palette-trigger],
+    [data-theme-toggle] {
+      display: none !important;
+    }
+
+    .post-layout {
+      display: block;
+      max-width: none;
+      padding: 0;
+    }
+
+    a {
+      color: black;
+      text-decoration: underline;
     }
   }
 }

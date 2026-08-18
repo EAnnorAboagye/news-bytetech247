@@ -1,0 +1,92 @@
+---
+// Tips/contact page (build plan Phase 11). Forked from
+// bytetech247.com's contact.astro, copy led with "story tips" rather
+// than generic contact framing — a real news-specific concept this
+// site's guides-focused sibling doesn't need. Same email
+// (siteConfig.contactEmail, a working inbox — reused rather than
+// standing up a new tips@ address that would need its own Cloudflare
+// Email Routing forward first) and the same contact form.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { siteConfig } from "../config";
+
+const socialLinks = Object.entries(siteConfig.social);
+---
+
+<BaseLayout
+  title={`Tips & Contact — ${siteConfig.name}`}
+  description={`Send a story tip or get in touch with ${siteConfig.name}.`}
+  noindex
+>
+  <article class="legal">
+    <h1>Tips &amp; Contact</h1>
+    <p>
+      Have a story tip, a correction, or a question? The fastest way to reach {
+        siteConfig.name
+      } is email:
+    </p>
+    <p>
+      <a href={`mailto:${siteConfig.contactEmail}`} class="contact-email">
+        {siteConfig.contactEmail}
+      </a>
+    </p>
+    <p>
+      Prefer a form instead of email?{" "}
+      <a href={siteConfig.contactFormUrl}>Use the contact form</a> — it goes to the
+      same inbox.
+    </p>
+
+    {
+      socialLinks.length > 0 && (
+        <>
+          <p>You can also find {siteConfig.name} on:</p>
+          <ul class="contact-social">
+            {socialLinks.map(([platform, href]) => (
+              <li>
+                <a href={href}>{platform}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    <h2>Reporting a security issue</h2>
+    <p>
+      Found a security vulnerability rather than a story tip or a content issue?
+      Please use the contact method listed in{" "}
+      <a href="/.well-known/security.txt">security.txt</a> (RFC 9116) instead, so
+      it's handled separately from general messages.
+    </p>
+
+    <p class="legal__disclaimer">
+      Spotted something outdated or incorrect in a story? See the{" "}
+      <a href="/editorial-policy/">Editorial Policy</a> for how corrections are handled.
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .contact-email {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .contact-social {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: calc(var(--spacing) * 3);
+    text-transform: capitalize;
+  }
+
+  .contact-social a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+</style>
