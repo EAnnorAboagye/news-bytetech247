@@ -31,3 +31,4 @@ Allow: /
 
 Sitemap: https://news.bytetech247.com/sitemap.xml
 Sitemap: https://news.bytetech247.com/rss.xml
+Sitemap: https://news.bytetech247.com/news-sitemap.xml
