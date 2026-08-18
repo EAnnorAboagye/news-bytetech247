@@ -5,6 +5,18 @@ compatibility_date = "2026-08-18"
 # *.workers.dev deployment alongside the custom domain.
 workers_dev = false
 
+# custom_domain = true (not a plain route pattern) tells Cloudflare to
+# provision this as a real Custom Domain — DNS record + edge
+# certificate created automatically in the same zone bytetech247.com
+# already lives in, since news.bytetech247.com is a subdomain of that
+# same already-Cloudflare-managed zone. bytetech247.com's own
+# wrangler.toml doesn't have an equivalent block (that binding predates
+# this pattern and was done by hand in the dashboard) — this is the
+# same end state, just declared in code instead.
+[[routes]]
+pattern = "news.bytetech247.com"
+custom_domain = true
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"
