@@ -1,8 +1,14 @@
 ---
-// Placeholder homepage for Phase 0's scaffold check. Replaced with the
-// real homepage (ticker, asymmetric hero, Popular Now, category rails)
-// in Phase 6 of the build plan, once BaseLayout (Phase 3) and the
-// content model (Phase 1) exist.
+// Placeholder homepage. Replaced with the real homepage (ticker,
+// asymmetric hero, Popular Now, category rails) in Phase 6 of the build
+// plan, once BaseLayout (Phase 3) exists. For now this just proves
+// Phase 2's token stylesheet and layout primitives compile and render
+// together.
+import "../styles/global.css";
+import Center from "../components/layout/Center.astro";
+import Stack from "../components/layout/Stack.astro";
+import Grid from "../components/layout/Grid.astro";
+import { CATEGORIES } from "../config";
 ---
 
 <!doctype html>
@@ -13,7 +19,25 @@
     <title>ByteTech247 News</title>
   </head>
   <body>
-    <h1>ByteTech247 News</h1>
-    <p>Scaffold in progress.</p>
+    <Center>
+      <Stack space="6">
+        <h1>ByteTech247 News</h1>
+        <p>Scaffold in progress — Phase 2 token/primitive check.</p>
+        <Grid minItemWidth="10rem" space="3">
+          {
+            /* References --category-accent-* directly rather than the
+               --card-accent indirection PostCard.astro will use — that
+               data-category mapping is a Phase 6 concern, not Phase 2's. */
+            CATEGORIES.map((category) => (
+              <div
+                style={`border-radius:0.5rem;padding:1rem;background-color:var(--category-accent-${category.slug});color:var(--color-accent-fg);font-family:var(--font-display);`}
+              >
+                {category.name}
+              </div>
+            ))
+          }
+        </Grid>
+      </Stack>
+    </Center>
   </body>
 </html>
