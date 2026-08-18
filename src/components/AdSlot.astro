@@ -1,0 +1,45 @@
+---
+// Manual, CLS-safe ad placement — ported verbatim from bytetech247.com.
+// Renders nothing if no slot ID is configured in src/config.ts
+// (siteConfig.adSlots) — a missing slot ID is a safe no-op, not a
+// broken <ins> tag with an empty data-ad-slot.
+//
+// The reserved space is load-bearing, not decorative: it's set before
+// the AdSense script has run, so the layout never shifts once the
+// creative (or nothing, if unfilled) loads in.
+//
+// Three buckets, matching the .ad-slot[data-ad-size=...] rules in
+// global.css:
+// - "banner": slim top-of-page (homepageHeader)
+// - "rectangle": the default, most homepage/in-article placements
+// - "tower": a desktop-only sidebar, not used on the homepage
+type AdSize = "banner" | "rectangle" | "tower";
+
+import { siteConfig } from "../config";
+
+interface Props {
+  adSlot: string;
+  size: AdSize;
+  label?: string;
+  class?: string;
+}
+
+const { adSlot, size, label = "Advertisement", class: className } = Astro.props;
+const adClient = siteConfig.adsensePublisherId;
+---
+
+{
+  adSlot && (
+    <div class:list={["ad-slot", className]} data-ad-size={size}>
+      <p class="ad-slot__label">{label}</p>
+      <ins
+        class="adsbygoogle"
+        style="display:block;width:100%;height:100%"
+        data-ad-client={adClient}
+        data-ad-slot={adSlot}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+    </div>
+  )
+}

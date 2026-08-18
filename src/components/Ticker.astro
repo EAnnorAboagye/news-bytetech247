@@ -1,0 +1,168 @@
+---
+// Live Wire ticker — top-stories marquee, no bytetech247.com analog
+// (build plan Phase 3/6, Blueprint artifact). Genuinely new UI, so it
+// carries its own accessibility discipline rather than borrowing an
+// existing pattern:
+// - The animated scroll uses a duplicated second copy of the list for a
+//   seamless loop (translateX 0 -> -50%) — a common marquee technique,
+//   but the duplicate is a REAL accessibility hazard on its own
+//   (duplicate tab stops, duplicate screen-reader announcements for the
+//   same links). Marked aria-hidden + tabindex="-1" here so only the
+//   first, real copy is ever reachable or announced.
+// - Not aria-live: a continuously-scrolling region firing live-region
+//   announcements on every frame would spam assistive tech; the real
+//   copy's links are just normal, tab-reachable anchors in DOM order.
+// - prefers-reduced-motion: reduce stops the animation AND hides the
+//   duplicate copy, falling back to a plain user-scrollable list rather
+//   than a frozen illusion of motion.
+// - Pauses on hover and on focus-within, so a keyboard user tabbing
+//   through the real copy's links never has the item they're focused on
+//   scroll out from under them.
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  posts: CollectionEntry<"blog">[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <div class="ticker">
+      <span class="ticker__label">Live wire</span>
+      <div class="ticker__track-wrap">
+        <div class="ticker__track">
+          <ul class="ticker__list">
+            {posts.map((post, i) => (
+              <li>
+                <a href={`/${post.data.category}/${post.id}/`}>
+                  <span class="ticker__index" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {post.data.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <ul class="ticker__list ticker__list--duplicate" aria-hidden="true">
+            {posts.map((post, i) => (
+              <li>
+                <a href={`/${post.data.category}/${post.id}/`} tabindex="-1">
+                  <span class="ticker__index" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {post.data.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .ticker {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+    padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 4);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background-color: var(--color-bg-subtle);
+  }
+
+  .ticker__label {
+    flex-shrink: 0;
+    padding-right: calc(var(--spacing) * 3);
+    border-right: 1px solid var(--color-border);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+  }
+
+  .ticker__track-wrap {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .ticker__track {
+    display: flex;
+    width: max-content;
+    animation: ticker-scroll 36s linear infinite;
+  }
+
+  .ticker__track-wrap:hover .ticker__track,
+  .ticker__track-wrap:focus-within .ticker__track {
+    animation-play-state: paused;
+  }
+
+  @keyframes ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .ticker__list {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ticker__list a {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    min-height: 24px;
+    white-space: nowrap;
+    color: var(--color-fg-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .ticker__list a:hover {
+    color: var(--color-accent);
+  }
+
+  .ticker__index {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticker__track {
+      animation: none;
+      width: auto;
+    }
+
+    .ticker__track-wrap {
+      overflow-x: auto;
+    }
+
+    .ticker__list--duplicate {
+      display: none;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .ticker__label {
+      display: none;
+    }
+
+    .ticker {
+      padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+    }
+  }
+</style>

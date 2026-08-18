@@ -352,4 +352,62 @@
   [data-category="startups"] {
     --card-accent: var(--category-accent-startups);
   }
+
+  /*
+   * AdSlot's markup — global, not scoped inside AdSlot.astro, because a
+   * future in-article ad plugin (Phase 7) may need to emit this same
+   * markup shape directly into compiled MDX, outside Astro's component-
+   * scoping system, the same reason bytetech247.com keeps this global.
+   * Ported verbatim, including the shadow-card + border-radius Card.astro
+   * already uses — every other box on this site with this footprint gets
+   * the same soft elevation.
+   */
+  .ad-slot {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 1);
+    padding: calc(var(--spacing) * 2);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background-color: var(--color-bg-subtle);
+    box-shadow: var(--shadow-card);
+  }
+
+  .ad-slot__label {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+    user-select: none;
+  }
+
+  .ad-slot ins {
+    flex: 1;
+  }
+
+  /*
+   * Reserved height per size bucket, not a per-instance inline value —
+   * see AdSlot.astro's own comment. Mobile gets a shorter "rectangle"
+   * reservation than tablet/desktop: Google's auto/full-width-responsive
+   * format renders a shorter unit in a narrower container.
+   */
+  .ad-slot[data-ad-size="banner"] {
+    min-height: 100px;
+  }
+
+  .ad-slot[data-ad-size="rectangle"] {
+    min-height: 120px;
+  }
+
+  .ad-slot[data-ad-size="tower"] {
+    min-height: 600px;
+  }
+
+  @media (min-width: 40rem) {
+    .ad-slot[data-ad-size="rectangle"] {
+      min-height: 250px;
+    }
+  }
 }
