@@ -4,15 +4,14 @@
 // Cloudflare Web Analytics beacon, AdSense loader + activation delegate,
 // dark-mode FOUC-avoidance script, full meta/OG/Twitter/canonical/robots
 // pipeline, jsonLd array rendering, data-pagefind-body wrapper, focus
-// management — with two real differences: gtag and the CF beacon are
-// gated behind their config values being non-empty (analyticsId and
-// cloudflareBeaconToken are both "" until a real GA4 property / Web
-// Analytics site exists for this domain — see src/config.ts), so this
-// site doesn't fire broken analytics requests with an empty ID in the
-// meantime. The google-site-verification meta tag is dropped entirely
-// until a Search Console property exists for this domain (Phase 13) —
-// bytetech247.com's own verification code would not verify this domain
-// and shouldn't be reused.
+// management — with real differences: the CF beacon is still gated
+// behind cloudflareBeaconToken being non-empty (no Cloudflare Web
+// Analytics site exists for this domain yet — see src/config.ts), so
+// this site doesn't fire a broken request with an empty token in the
+// meantime. gtag is unconditional now that siteConfig.analyticsId holds
+// this domain's own real GA4 property ID. The google-site-verification
+// meta tag below is this domain's own real Search Console code, not
+// bytetech247.com's — that one would not verify this domain.
 import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 import { siteConfig } from "../config";
@@ -101,11 +100,12 @@ const jsonLdBlocks = [
          {condition && (<script>...)} block — that pattern reliably broke
          prettier-plugin-astro's parser on this specific script's content,
          a formatting-only failure, not a build one) with the actual gate
-         inside the script itself: analyticsId is "" until a real GA4
-         property exists for this domain (src/config.ts), and every call
-         below is a no-op against an empty ID, so guarding at the top
-         keeps this from firing a single network request in the
-         meantime. -->
+         inside the script itself: siteConfig.analyticsId now holds this
+         domain's real GA4 property ID, so the guard below is always true
+         in production, but it stays in place rather than being removed —
+         it's what keeps this from firing a broken request if analyticsId
+         is ever unset again (a local dev override, a future property
+         migration), the same reasoning that justified it originally. -->
     <script define:vars={{ analyticsId: siteConfig.analyticsId }}>
       if (analyticsId) {
         window.dataLayer = window.dataLayer || [];
@@ -217,6 +217,10 @@ const jsonLdBlocks = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta
+      name="google-site-verification"
+      content="Q7Gw17KC8cG9r4zyeMycGAfPXpAzdGeThLa9evSl-54"
+    />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonicalUrl} />
     <link

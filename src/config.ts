@@ -59,7 +59,7 @@ export const siteConfig = {
   url: "https://news.bytetech247.com",
   title: "ByteTech247 News | Fast, Sourced Tech & AI Coverage",
   description:
-    "ByteTech247 News covers AI, software, big tech, and startups — fast, sourced reporting on what's actually moving in tech today.",
+    "Fast, sourced tech news covering AI, software, electronics, automotive, big tech, and startups, corrected transparently when a detail changes.",
   author: {
     // Same operator as bytetech247.com — see build history there.
     name: "Aboagye Annor",
@@ -75,12 +75,15 @@ export const siteConfig = {
     tiktok: "https://www.tiktok.com/@bytetech247",
   } as Record<string, string>,
 
-  // No dedicated OG/logo assets generated yet for this property — null
-  // here is a safe no-op (matches bytetech247.com's own `string | null`
-  // contract for these two fields), not a placeholder to forget about.
-  // Generate real 1200x630 OG art and a square logo mark before launch.
+  // logoImage: real 512x512 publisher logo (public/logo-512.png,
+  // generated from the site's own logo-mark.svg), feeds
+  // NewsMediaOrganization's `logo` field in json-ld.ts — this is what
+  // lets Google News/Discover results show a real publisher mark instead
+  // of nothing. defaultOgImage is still null (no dedicated 1200x630
+  // social-share image generated yet) — a safe no-op, not a placeholder
+  // to forget about; generate one before that's needed.
   defaultOgImage: null as string | null,
-  logoImage: null as string | null,
+  logoImage: "/logo-512.png" as string | null,
 
   // Reusing bytetech247.com's working inbox — a dedicated tips@ or
   // news@ address would need its own Cloudflare Email Routing forward
@@ -93,11 +96,10 @@ export const siteConfig = {
   // Same operator, same jurisdiction as bytetech247.com.
   jurisdiction: "Ghana",
 
-  // Left empty until a dedicated GA4 property exists for this domain —
-  // same "safe no-op until a real ID exists" convention as adSlots below.
-  // Do not reuse bytetech247.com's analyticsId; it would misattribute
-  // this site's traffic to the wrong GA4 property.
-  analyticsId: "",
+  // This domain's own dedicated GA4 property — distinct from
+  // bytetech247.com's own analyticsId, which would misattribute this
+  // site's traffic to the wrong property.
+  analyticsId: "G-QCK9SYFM29",
 
   // Same reasoning as analyticsId — a Cloudflare Web Analytics beacon
   // token is generated per-site in the dashboard once the zone exists.
