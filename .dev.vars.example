@@ -1,0 +1,10 @@
+# Local-dev secrets. Copy to `.dev.vars` (gitignored) and fill in a real
+# value — never commit the real file. The production secret is set
+# separately via `wrangler secret put CSP_NONCE_SECRET`, not from this
+# file.
+
+# HMAC key for the CSP nonce derivation (worker/index.ts's deriveNonce())
+# — any random string works for local dev; it only needs to be
+# unguessable in production. Generate one with:
+#   node -e "console.log(crypto.randomUUID())"
+CSP_NONCE_SECRET=your-local-dev-secret-here

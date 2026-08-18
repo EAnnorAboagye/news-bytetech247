@@ -5,7 +5,16 @@ import eslintPluginAstro from "eslint-plugin-astro";
 import globals from "globals";
 
 export default tseslint.config(
-  { ignores: ["dist/", ".astro/", "node_modules/"] },
+  {
+    // .wrangler/ is wrangler dev's own bundled-output cache, gitignored
+    // but not something ESLint's file walk consults .gitignore for on
+    // its own — without this, running `wrangler dev` locally (e.g. to
+    // test worker/index.ts against curl, see the build plan's Phase 4)
+    // leaves temp bundles behind that then fail lint with a wall of
+    // no-undef errors for Workers runtime globals the bundler already
+    // resolved, not real problems in this project's own source.
+    ignores: ["dist/", ".astro/", "node_modules/", ".wrangler/"],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
