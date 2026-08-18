@@ -9,8 +9,17 @@
 #   node -e "console.log(crypto.randomUUID())"
 CSP_NONCE_SECRET=your-local-dev-secret-here
 
+# Pexels API key (news-article skill only — read at authoring time when
+# sourcing a cover photo, the default cover-image source since AI-
+# generated art was dropped, see SKILL.md §6; never shipped to the
+# deployed Worker, since images are downloaded once and committed as
+# static assets, not fetched at build or request time). Free key from
+# https://www.pexels.com/api/.
+PEXELS_API_KEY=your-pexels-api-key-here
+
 # Cloudflare Workers AI credentials for scripts/generate-conceptual-cover.mjs
-# (news-article skill's default cover-image source — see SKILL.md §6). A
+# (news-article skill's rare AI-generation fallback — see SKILL.md §6a,
+# used only when no real photo fits a genuinely abstract story). A
 # separate concern from the CLOUDFLARE_API_TOKEN GitHub Actions secret
 # that deploys the Worker: this one is used locally, at authoring time,
 # to call the Workers AI REST API directly, never shipped to the deployed

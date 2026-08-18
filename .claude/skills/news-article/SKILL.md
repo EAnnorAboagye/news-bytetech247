@@ -131,55 +131,73 @@ launch events. Every claim of authority in a post has to be true to that:
 
 ## 6. Cover image sourcing
 
-This site doesn't source from Pexels at all — generic stock photography reads as filler on a story
-about a specific company/product, and there's no `PEXELS_API_KEY` provisioned in this repo. Default
-path for every post: a **bespoke AI-generated illustration**, run through
-`scripts/generate-conceptual-cover.mjs` (Cloudflare Workers AI, `flux-1-schnell`):
+**Real photography first, always.** A news story is about something that actually happened to a real
+company, product, or person — a real photo grounds that in a way an illustration can't, and readers
+trust it more. AI-generated art was tried as this site's default and dropped: it read as generic and
+made every story look the same. Priority order:
+
+1. **An official company/press image** — a press-kit product shot, an executive headshot from the
+   company's own newsroom. The best option when one exists and is clearly usable editorially. Credit
+   via `coverImageCredit: { name, url }` pointing at the source.
+2. **A genuinely fitting Pexels photo** — the default for most stories. Search by the story's actual
+   subject (the specific product category, industry, or setting — "electric sports car," "data center
+   server racks," "office skyline at dusk"), not generic terms like "technology" or "business."
+3. **A bespoke AI-generated illustration** (§6a below) — the fallback, only when neither of the above
+   applies. Rare, not routine.
+
+### The Pexels workflow
+
+1. Read `PEXELS_API_KEY` from `.dev.vars` (never hardcode it, never print it back in chat or commit
+   it). Not yet provisioned in a fresh checkout of this repo — see `.dev.vars.example`.
+2. Search by the story's real subject:
+   ```bash
+   curl -H "Authorization: $PEXELS_API_KEY" \
+     "https://api.pexels.com/v1/search?query=<topic>&per_page=3&orientation=landscape"
+   ```
+3. Show 2-3 candidates — thumbnail URL, photographer name, the photo's Pexels page URL — and wait for
+   explicit approval before downloading. Never auto-select; downloading a file is an explicit-
+   permission action regardless of how routine it feels.
+4. Download the chosen photo's `src.large` (or `src.original`) into the post's content folder as
+   `cover.jpg`, matching the existing local-asset pattern (`coverImage: "./cover.jpg"`) — never a
+   hotlinked remote URL in frontmatter.
+5. Write `coverImageAlt` honestly. If the photo shows the actual subject (an official image), describe
+   it as such. If it's a generic-but-relevant stock photo (the far more common case — Pexels won't have
+   a real photo of a specific unreleased chip or a specific funding round), the alt text has to say so
+   plainly enough that no reader mistakes it for the real thing: "Stock photo of a generic electric
+   sports car" is honest, "The Ferrari Luce, chassis 0" is a lie if the photo is really a different car.
+   This is the same misinformation-risk discipline the AI-generation path already enforced, applied to
+   stock photography instead — a stock photo standing in for a specific real object is exactly as
+   misleading as a fabricated one if it isn't labeled as standing in.
+6. Set `coverImageCredit: { name, url }` (photographer's name + their Pexels profile URL) — Pexels'
+   license doesn't require in-post attribution, but a visible credit is a real trust signal and it's
+   cheap to show. `[slug].astro` renders it under the cover image automatically once this field is set.
+
+### §6a. AI-generated fallback (rare — only when no real photo fits)
+
+For a story genuinely too abstract for any photo to represent (a bare revenue/earnings figure with no
+visual hook, for instance), fall back to `scripts/generate-conceptual-cover.mjs` (Cloudflare Workers
+AI, `flux-1-schnell`):
 
 ```bash
 node scripts/generate-conceptual-cover.mjs <post-folder>/cover.jpg "<subject prompt>"
 ```
 
-**The prompt must be written fresh, per story, from that story's actual facts — never a fixed
-template reused across a category.** The failure mode this guards against is real: if every `ai-news`
-post gets some variant of "glowing neural network, interconnected nodes," the covers stop being
-distinguishable from each other and stop telling the reader anything about _this_ story. Instead,
-derive the concrete visual metaphor from what the story specifically is:
+The prompt must still be written fresh, per story, from that story's actual facts — never a fixed
+template reused across a category (a repeated "glowing neural network" on every `ai-news` post is
+exactly the genericness that got AI-generated art dropped as the default). Pull the category's
+`--category-accent-*` OKLCH hue (`src/styles/global.css`) into the prompt's color language for
+category-level consistency; keep the composition specific to the one story. Never name the real
+company/product in the prompt in a way that pushes the model to reproduce its logo. Open the result
+and check it by eye for garbled pseudo-text or logo-like artifacts before committing.
 
-- "Foldable laptop displays past crease problem" → a folding, hinging plane of light — not a generic
-  "electronics" icon.
-- "Solid-state battery EV enters production" → a stylized battery-cell cross-section merging into a
-  vehicle silhouette — not a generic "EV" icon.
-- "\[Startup] raises \$40M Series B" → an abstract upward-growth motif tied to that startup's actual
-  product category (dev tooling, climate tech, fintech — whatever it specifically is), not a generic
-  "money" or "rocket" image reused for every funding story.
+### Hard rules, regardless of source
 
-Two things stay consistent across a category on purpose, and only these two: pull the category's
-`--category-accent-*` OKLCH hue (`src/styles/global.css`) into the prompt's color language so posts in
-the same category read as one family at a glance, and keep the illustration style abstract (per the
-negative-constraint suffix the script always appends) rather than photorealistic. Everything else —
-subject, composition, motif — has to be specific to that one story.
-
-**Never name the real company/product in a way that pushes the model to reproduce its logo or exact
-product design** — describe the abstract visual metaphor instead ("a folding plane of light," not "a
-\[Brand] \[Product] laptop"). The script's negative suffix already blocks logos/brand marks and
-photorealism structurally; the positive half of the prompt shouldn't work against that.
-
-**Open the generated image and check it by eye before committing** — confirm there's no garbled
-pseudo-text or logo-like artifact (a known diffusion-model failure mode the negative suffix reduces
-but doesn't guarantee against). Regenerate with an adjusted prompt if there is.
-
-**Override with a real official image only when one is clearly the better, lower-risk choice** — a
-company's own press-kit product shot or an executive headshot from their newsroom, credited via
-`coverImageCredit: { name, url }` pointing at the source. This is the exception, not the default; when
-in doubt, generate.
-
-**Never generate or use an image that could pass as a real screenshot of an announcement, tweet,
-product UI, or filing, and never a photorealistic render that could pass as an actual product photo.**
-For a guide site a fabricated "screenshot" is misleading; for a news site either failure mode is a
-real misinformation risk — a reader has no way to tell a fabricated image from a real one, and this
-site's entire credibility rests on not being the source of that confusion. `validate-cover-image.ts`
-still requires ≥1600×900 (16:9) regardless of source.
+**Never use or generate an image that could pass as a real screenshot of an announcement, tweet,
+product UI, or filing, and never a photorealistic AI render that could pass as an actual product
+photo.** A reader has no way to tell a fabricated image from a real one, and this site's entire
+credibility rests on not being the source of that confusion. **Never caption a generic stock photo as
+if it depicts the story's actual specific subject** — that's the same failure mode in a different
+package. `validate-cover-image.ts` requires ≥1600×900 (16:9) regardless of source.
 
 ## 7. Frontmatter contract
 
@@ -229,10 +247,11 @@ build), each with a body reading literally "Placeholder fixture post — Phase 5
 - [ ] 2-4 internal links placed inline, not batched at the end.
 - [ ] No em dash in the prose; no banned phrase from §4 survived.
 - [ ] No claim of first-hand presence, testing, or attendance that isn't literally true.
-- [ ] Cover image is a bespoke AI-generated illustration with a prompt authored fresh from this
-      story's actual facts (not a reused per-category template), or a credited official press image
-      where that's clearly the better call — checked by eye for garbled pseudo-text/logo artifacts,
-      and never a fabricated "screenshot" or photorealistic fake product photo.
+- [ ] Cover image follows the §6 priority order (official press image, then a genuinely fitting
+      Pexels photo, then AI-generated art only as a rare fallback) — approved by the user from real
+      candidates if sourced from Pexels, credited via `coverImageCredit`, and honest in its alt text
+      about whether it depicts the actual subject or is a generic stand-in. Never a fabricated
+      "screenshot" or a photorealistic fake product photo.
 - [ ] Frontmatter matches §7 exactly — no `faq`, no `series`/`seriesOrder`.
 - [ ] If this replaces a placeholder fixture post, every placeholder field (body, cover, credit,
       possibly title/date) was actually verified or replaced, not left half-real.
