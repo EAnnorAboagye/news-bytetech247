@@ -37,4 +37,21 @@ browser-based VS Code" item that turned out to be a 2021 story mistakenly surfac
 All five: complete, real Pexels covers (credited), build-verified. 17 placeholder posts remain
 (ai-news: 11, automobile: 1, big-tech: 2, electronics: 1, software-news: 1, startups: 1).
 
+## 2026-08-18 (round 4)
+
+- **OpenAI launches ChatGPT for Teens, an age-gated 13-17 experience with parental controls, Study Mode, Quiet Hours, and Persona-based age verification** (ai-news) — Source: OpenAI's own announcement, TechCrunch, CNBC, Axios, Aug 18 2026 — Status: drafted (src/content/blog/openai-launches-chatgpt-for-teens, replaced placeholder openai-realtime-voice-api-ga)
+- **DOJ opens an antitrust probe into Andreessen Horowitz over two partners' board seats at competing data companies Databricks and Fivetran** (ai-news) — Source: Bloomberg, Forbes, Fortune, The Information, Aug 17 2026 — Status: drafted (src/content/blog/doj-antitrust-probe-andreessen-horowitz-ai-boards, replaced placeholder gpt-6-preview-launches-with-agent-mode)
+- **Apple overhauls EU App Store fees — flat 5% commission on off-App-Store transactions replaces the per-install Core Technology Fee, effective October 1** (big-tech) — Source: Apple's own newsroom, TechCrunch, CNBC, MacRumors, Aug 18 2026 — Status: drafted (src/content/blog/apple-overhauls-eu-app-store-fees, replaced placeholder meta-fresh-round-infrastructure-layoffs)
+
+Dropped after verification this round: Google Pixel 11 Pro Fold (actually announced Aug 12) and
+Stripe's reported $7B OpenRouter acquisition (report itself is from Aug 16, and Stripe has never
+officially confirmed it — only unnamed-source reporting).
+
+All three: complete, real Pexels covers (credited), build-verified. For the ChatGPT for Teens post
+specifically, the cover deliberately shows hands only, no identifiable face, given the story covers
+sensitive content (self-harm and romantic-roleplay restrictions) involving minors.
+
+14 placeholder posts remain (ai-news: 9, automobile: 1, big-tech: 1, electronics: 1, software-news: 1,
+startups: 1).
+
 Electronics: no candidate cleared the bar this run — RSS results were dominated by unconfirmed spec-leak/rumor coverage (Poco M8x, Samsung foldables "expected 2027," etc.), nothing that was both a confirmed single-company event and independently corroborated. Not padded to fill the category — re-check next run.
