@@ -1,0 +1,189 @@
+---
+// Category archive, paginated (build plan Phase 8 — the first real use
+// of Astro's paginate() anywhere in this codebase family; bytetech247.com's
+// equivalent page renders every post in the category unbounded, fine
+// for ~100 slow-cadence guide posts but not for a frequently-publishing
+// news site across 6 categories).
+//
+// Renamed from [category]/index.astro to [category]/[...page].astro:
+// page 1 lands at /{category}/ (no page-number segment), later pages at
+// /{category}/2/, /{category}/3/, ... — consistent with this site's
+// trailing-slash convention, no Worker changes needed (worker/index.ts's
+// redirect logic is already path-shape-generic).
+//
+// Flagged, not silently shipped: worker/index.ts's ARTICLE_PATH regex
+// will structurally match /{category}/2/ as if "2" were a post slug,
+// triggering a wasted (but harmless — falls through to normal serving)
+// markdown-negotiation fetch attempt on an Accept: text/markdown
+// request. Real browsers never send that header, so this never affects
+// an actual visitor; worth hardening later, not a v1 blocker.
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PostCard from "../../components/PostCard.astro";
+import {
+  CATEGORY_SLUGS,
+  getCategoryName,
+  getCategoryDescription,
+  siteConfig,
+} from "../../config";
+import { collectionPageJsonLd, breadcrumbJsonLd } from "../../lib/json-ld";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const allPosts = await getCollection("blog");
+  return CATEGORY_SLUGS.flatMap((slug) => {
+    const posts = allPosts
+      .filter((post) => post.data.category === slug)
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+    // Inlined rather than referencing the module-level PAGE_SIZE const —
+    // confirmed live (2026-08-18): Astro's build-time getStaticPaths
+    // extraction bundles this function into its own isolated chunk, and
+    // that bundling step silently dropped the outer const, failing the
+    // whole build with "PAGE_SIZE is not defined" despite npm run check
+    // passing clean. A literal inside the function body has nothing
+    // outside its own scope to drop.
+    return paginate(posts, {
+      params: { category: slug },
+      pageSize: 12,
+    });
+  });
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.params;
+const { page } = Astro.props;
+const categoryName = getCategoryName(category);
+const description = getCategoryDescription(category);
+
+const pageUrl = new URL(Astro.url.pathname, siteConfig.url).href;
+const categoryUrl = new URL(`/${category}/`, siteConfig.url).href;
+const jsonLdBlocks = [
+  collectionPageJsonLd({ name: categoryName, description, url: pageUrl }),
+  breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: categoryName, url: categoryUrl },
+  ]),
+];
+
+const title =
+  page.currentPage === 1
+    ? `${categoryName} — Archive`
+    : `${categoryName} — Page ${page.currentPage} of ${page.lastPage}`;
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLdBlocks}>
+  <Breadcrumbs
+    items={[
+      { name: "Home", url: siteConfig.url },
+      { name: categoryName, url: categoryUrl },
+    ]}
+  />
+  <h1>{categoryName}</h1>
+  <p class="category-intro">{description}</p>
+
+  {
+    page.data.length === 0 ? (
+      <p>No posts yet in this category.</p>
+    ) : (
+      <>
+        <h2 class="section-heading">
+          {page.currentPage === 1
+            ? "All posts"
+            : `Page ${page.currentPage} of ${page.lastPage}`}
+        </h2>
+        <div class="category-grid">
+          {page.data.map((post, index) => (
+            <PostCard post={post} eager={index < 4} />
+          ))}
+        </div>
+      </>
+    )
+  }
+
+  {
+    page.lastPage > 1 && (
+      <nav aria-label="Pagination" class="pagination">
+        {page.url.prev ? (
+          <a href={page.url.prev} class="pagination__link">
+            ← Newer
+          </a>
+        ) : (
+          <span />
+        )}
+        <span class="pagination__status">
+          Page {page.currentPage} of {page.lastPage}
+        </span>
+        {page.url.next ? (
+          <a href={page.url.next} class="pagination__link">
+            Older →
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .category-intro {
+    max-width: 40rem;
+    margin-top: calc(var(--spacing) * 2);
+    color: var(--color-fg-muted);
+    font-size: var(--text-lg);
+    line-height: 1.7;
+  }
+
+  .section-heading {
+    font-size: var(--text-2xl);
+    margin-top: calc(var(--spacing) * 6);
+    margin-bottom: calc(var(--spacing) * 4);
+    color: var(--color-fg);
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing) * 4);
+  }
+
+  @media (min-width: 40rem) {
+    .category-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .category-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 2);
+    margin-top: calc(var(--spacing) * 8);
+    padding-top: calc(var(--spacing) * 4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .pagination__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .pagination__link:hover {
+    text-decoration: underline;
+  }
+
+  .pagination__status {
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+  }
+</style>
