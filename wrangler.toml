@@ -1,0 +1,22 @@
+name = "news-bytetech247"
+main = "worker/index.ts"
+compatibility_date = "2026-08-18"
+# Deliberately off, matching bytetech247.com — avoids a duplicate
+# *.workers.dev deployment alongside the custom domain.
+workers_dev = false
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Serves dist/404.html with a real 404 status instead of an empty body.
+not_found_handling = "404-page"
+# Load-bearing: without this, requests matching a static asset (every
+# page, built as index.html) never invoke worker/index.ts's fetch() at
+# all, so CSP header injection and every other Worker-side behavior
+# silently never fires. Confirmed the hard way on bytetech247.com.
+run_worker_first = true
+
+# No [[kv_namespaces]] and no [vars] for v1 — this site doesn't need the
+# counter/rate-limit or paid-tool machinery bytetech247.com's Worker
+# carries (see Phase 4 of the build plan). Add a KV namespace here only
+# when a real feature needs it, not speculatively.

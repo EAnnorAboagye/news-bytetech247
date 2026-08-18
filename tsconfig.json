@@ -1,0 +1,8 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  // "worker" has its own tsconfig (worker/tsconfig.json) with Cloudflare
+  // Workers-specific globals that conflict with this project's DOM lib —
+  // checked separately via `npm run check`, not by this config.
+  "exclude": ["dist", "worker", ".claude/worktrees"]
+}

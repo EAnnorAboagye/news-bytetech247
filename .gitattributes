@@ -1,0 +1,15 @@
+# Normalize all text files to LF on checkout, matching Prettier's default
+# endOfLine="lf". Without this, core.autocrlf=true checks files out with
+# CRLF, so `prettier --write .` rewrites nearly every tracked file back to
+# LF on every run.
+* text=auto eol=lf
+
+# Known binary assets — never subject to text/EOL normalization.
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
