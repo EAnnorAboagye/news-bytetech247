@@ -11,6 +11,7 @@
 All five: complete, real Pexels covers (credited), build-verified, pushed and live.
 
 ## 2026-08-18 (round 2)
+
 - **Framework Laptop 12 gets an Intel "Wildcat Lake" Core Series 3 refresh — Thunderbolt 4, Wi-Fi 7, pre-orders open, ships October** (electronics) — Source: Framework's own blog, Phoronix, TechPowerUp, PC Gamer, Aug 18 2026 — Status: drafted (src/content/blog/framework-laptop-12-wildcat-lake-refresh, replaced placeholder foldable-laptop-displays-past-crease-problem)
 - **HP launches the ZBook Fury G1i, a 16" workstation laptop with up to 192GB RAM and Intel Arrow Lake HX Plus chips** (electronics) — Source: Notebookcheck (single source, flagged in the post), Aug 16-18 2026 — Status: drafted (src/content/blog/hp-zbook-fury-g1i-192gb-ram-arrow-lake-hx, replaced placeholder arm-chipset-30-percent-longer-battery-life)
 - **SpaceX completes its $60B all-stock acquisition of Cursor-maker Anysphere, the largest startup acquisition on record** (startups) — Source: SEC Form 8-K, Seeking Alpha, Yahoo Finance, Cryptopolitan, Aug 17-18 2026 — Status: drafted (src/content/blog/spacex-completes-60-billion-cursor-acquisition, replaced placeholder ai-coding-assistant-startup-unicorn-valuation)
