@@ -21,7 +21,7 @@ confirmed fact or this site's read on it.
   (the round is the news), not `ai-news` (that's for model/lab/policy news). A phone launch is
   `electronics`, not `big-tech`, even if the phone-maker is a big-tech company — `big-tech` is for
   leadership, acquisitions, and earnings, not product launches. If a story genuinely straddles two
-  categories, pick the one the *news hook itself* belongs to, not the one with the biggest brand name
+  categories, pick the one the _news hook itself_ belongs to, not the one with the biggest brand name
   in it.
 - **State what's confirmed versus still developing**, before drafting. A primary source (the
   company's own announcement, a filing, a direct quote, an official changelog) makes a claim
@@ -57,7 +57,7 @@ confirmed fact or this site's read on it.
    present, always after the reporting: `## Why it matters` (or a genuinely more specific label for
    this story, e.g. `## What this means for developers`). Everything under this heading is this
    site's read: context, comparison to what came before, what to watch next, what's still unproven.
-   This is where judgment belongs — and *only* here. See §3 for how to write it so it reads as
+   This is where judgment belongs — and _only_ here. See §3 for how to write it so it reads as
    informed analysis, not disguised opinion or padded speculation.
 6. **Citations** — the primary source linked inline, at the point in the reporting section where the
    claim it backs is made, not batched into a "sources" list at the end.
@@ -143,7 +143,7 @@ node scripts/generate-conceptual-cover.mjs <post-folder>/cover.jpg "<subject pro
 **The prompt must be written fresh, per story, from that story's actual facts — never a fixed
 template reused across a category.** The failure mode this guards against is real: if every `ai-news`
 post gets some variant of "glowing neural network, interconnected nodes," the covers stop being
-distinguishable from each other and stop telling the reader anything about *this* story. Instead,
+distinguishable from each other and stop telling the reader anything about _this_ story. Instead,
 derive the concrete visual metaphor from what the story specifically is:
 
 - "Foldable laptop displays past crease problem" → a folding, hinging plane of light — not a generic
@@ -201,7 +201,7 @@ build), each with a body reading literally "Placeholder fixture post — Phase 5
 `coverImageAlt` starting "Placeholder cover image for...". When turning one of these into a real post:
 
 - Treat it as a full rewrite, not a rewording. The placeholder's `title`/`category`/`slug` were
-  invented to *sound* plausible for seeding pagination and layout testing — verify the actual news
+  invented to _sound_ plausible for seeding pagination and layout testing — verify the actual news
   still holds (or find the real current story for that slot) before trusting any of that frontmatter
   as fact. Don't just replace the body text under an unverified title.
 - Replace `coverImage`/`coverImageAlt`/`coverImageCredit` following §6 — the placeholder cover is a

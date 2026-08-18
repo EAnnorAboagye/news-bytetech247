@@ -1,6 +1,7 @@
 # Discovered News Log
 
 ## 2026-08-18
+
 - **Alibaba releases open weights for Qwen3.8-27B, a "laptop-ready" model running frontier-class coding/reasoning locally, no cloud API required — direct challenge to Meta's open-model lineup** (ai-news) — Source: Alibaba Cloud Community (official blog), preview Aug 3 / weights Aug 17-18 2026; corroborated by CNBC, VentureBeat, SCMP, TechJuice (Aug 17-18) — Status: drafted (src/content/blog/alibaba-qwen3-8-27b-laptop-ready-open-model, replaced placeholder mistral-releases-coding-focused-model)
 - **Cursor's Origin (AI-agent-first git/code-hosting platform, GitHub sync, agent-aware code review) goes live in public beta — same day as a major GitHub outage** (software-news) — Source: VentureBeat, TechStartups, BigGo Finance, Aug 17-18 2026 (first announced at Cursor's Compile conference, June 2026) — Status: drafted (src/content/blog/cursor-origin-code-hosting-github-outage, replaced placeholder figma-real-time-code-handoff-react)
 - **AI inference-chip startup Etched raises $700M at a $21B valuation (up from $10.3B in July), led by Jane Street** (startups) — Source: TechCrunch, Aug 18 2026 — Status: drafted (src/content/blog/etched-ai-chip-startup-21-billion-valuation, replaced placeholder dev-tools-startup-raises-40m-series-b)
