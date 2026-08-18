@@ -1,0 +1,151 @@
+---
+// Grouped-by-category overview, not a flat title list — each category
+// shows its total post count and its most recent posts, with a "View
+// all" link through to the now-paginated /[category]/ (Phase 8) for the
+// rest. Ported structurally from bytetech247.com's archive.astro —
+// already capped per category with its own "View all" escape hatch, so
+// it doesn't need Phase 8/9's paginate() treatment itself.
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import { siteConfig, CATEGORIES } from "../config";
+
+const RECENT_PER_CATEGORY = 3;
+
+const allPosts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const categorySections = CATEGORIES.map((category) => {
+  const categoryPosts = allPosts.filter(
+    (post) => post.data.category === category.slug,
+  );
+  return {
+    category,
+    count: categoryPosts.length,
+    recentPosts: categoryPosts.slice(0, RECENT_PER_CATEGORY),
+  };
+});
+---
+
+<BaseLayout
+  title={`Archive — ${siteConfig.name}`}
+  description={`Browse every ${siteConfig.name} post by category.`}
+  noindex
+>
+  <h1>Archive</h1>
+  <p class="archive-intro">Browse every post by category.</p>
+
+  {
+    allPosts.length === 0 ? (
+      <p>No posts yet.</p>
+    ) : (
+      <div class="archive-categories">
+        {categorySections.map(
+          ({ category, count, recentPosts }, sectionIndex) => (
+            <section aria-labelledby={`archive-${category.slug}`}>
+              <div class="archive-category__header">
+                <h2 id={`archive-${category.slug}`}>{category.name}</h2>
+                <span class="archive-category__count">
+                  {count} {count === 1 ? "post" : "posts"}
+                </span>
+              </div>
+
+              {recentPosts.length > 0 ? (
+                <div class="archive-grid">
+                  {recentPosts.map((post) => (
+                    <PostCard post={post} eager={sectionIndex === 0} />
+                  ))}
+                </div>
+              ) : (
+                <p class="archive-category__empty">
+                  No posts yet in {category.name}.
+                </p>
+              )}
+
+              {count > RECENT_PER_CATEGORY && (
+                <a
+                  href={`/${category.slug}/`}
+                  class="archive-category__view-all"
+                >
+                  View all {category.name} posts →
+                </a>
+              )}
+            </section>
+          ),
+        )}
+      </div>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .archive-intro {
+    color: var(--color-fg-muted);
+    margin-bottom: calc(var(--spacing) * 6);
+  }
+
+  .archive-categories {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 8);
+  }
+
+  .archive-category__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing);
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+
+  .archive-category__header h2 {
+    margin: 0;
+  }
+
+  .archive-category__count {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-fg-muted);
+  }
+
+  .archive-category__empty {
+    color: var(--color-fg-muted);
+  }
+
+  .archive-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing) * 4);
+  }
+
+  @media (min-width: 40rem) {
+    .archive-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .archive-category__view-all {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    margin-top: calc(var(--spacing) * 4);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .archive-category__view-all:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 48rem) {
+    .archive-category__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: calc(var(--spacing) * 0.5);
+    }
+  }
+</style>

@@ -1,0 +1,169 @@
+---
+// Tag archive, paginated (build plan Phase 9) — same paginate() treatment
+// as the category archive (Phase 8), applied here too since a popular
+// tag will outgrow "show everything" faster than any guide-site tag
+// did. Forked from bytetech247.com's tag/[tag].astro's slug-casing
+// preservation map and noindex/collectionPageJsonLd contract.
+//
+// Renamed from tag/[tag].astro to tag/[tag]/[...page].astro: page 1 at
+// /tag/{tag}/, later pages at /tag/{tag}/2/, ... — same convention as
+// the category archive.
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Center from "../../../components/layout/Center.astro";
+import PostCard from "../../../components/PostCard.astro";
+import { siteConfig } from "../../../config";
+import { slugifyTag } from "../../../lib/taxonomy";
+import { collectionPageJsonLd, breadcrumbJsonLd } from "../../../lib/json-ld";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getCollection("blog");
+
+  // slug -> first-seen display casing, e.g. "json-ld" -> "json-ld" or
+  // "Cloud Hosting" -> "cloud-hosting" display "Cloud Hosting".
+  const tagDisplayBySlug = new Map<string, string>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      const slug = slugifyTag(tag);
+      if (!tagDisplayBySlug.has(slug)) tagDisplayBySlug.set(slug, tag);
+    }
+  }
+
+  return [...tagDisplayBySlug.entries()].flatMap(([slug, display]) => {
+    const tagPosts = posts
+      .filter((post) => post.data.tags.some((t) => slugifyTag(t) === slug))
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+    // Inlined literal, not a module-level const — Phase 8's category
+    // archive hit a real Astro build bug (getStaticPaths' isolated
+    // bundling silently dropped an outer-scope const) doing exactly
+    // that; the fix carries over here on the same pattern.
+    return paginate(tagPosts, {
+      params: { tag: slug },
+      props: { display },
+      pageSize: 12,
+    });
+  });
+}) satisfies GetStaticPaths;
+
+const { display, page } = Astro.props;
+const description = `Posts tagged "${display}" on ${siteConfig.name}.`;
+
+const pageUrl = new URL(Astro.url.pathname, siteConfig.url).href;
+const tagUrl = new URL(`/tag/${Astro.params.tag}/`, siteConfig.url).href;
+const jsonLdBlocks = [
+  collectionPageJsonLd({ name: `#${display}`, description, url: pageUrl }),
+  breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: `#${display}`, url: tagUrl },
+  ]),
+];
+
+const title =
+  page.currentPage === 1
+    ? `#${display} — ${siteConfig.name}`
+    : `#${display} — Page ${page.currentPage} of ${page.lastPage} — ${siteConfig.name}`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  jsonLd={jsonLdBlocks}
+  noindex
+>
+  <Center gutter="0">
+    <p><a href="/" class="home-link">Home</a></p>
+    <h1>#{display}</h1>
+
+    {
+      page.data.length === 0 ? (
+        <p>No posts yet with this tag.</p>
+      ) : (
+        <div class="tag-grid">
+          {page.data.map((post, index) => (
+            <PostCard post={post} eager={index < 4} />
+          ))}
+        </div>
+      )
+    }
+
+    {
+      page.lastPage > 1 && (
+        <nav aria-label="Pagination" class="pagination">
+          {page.url.prev ? (
+            <a href={page.url.prev} class="pagination__link">
+              ← Newer
+            </a>
+          ) : (
+            <span />
+          )}
+          <span class="pagination__status">
+            Page {page.currentPage} of {page.lastPage}
+          </span>
+          {page.url.next ? (
+            <a href={page.url.next} class="pagination__link">
+              Older →
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )
+    }
+  </Center>
+</BaseLayout>
+
+<style>
+  .home-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+
+  .tag-grid {
+    margin-top: calc(var(--spacing) * 6);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: calc(var(--spacing) * 4);
+  }
+
+  @media (min-width: 40rem) {
+    .tag-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .tag-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 2);
+    margin-top: calc(var(--spacing) * 8);
+    padding-top: calc(var(--spacing) * 4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .pagination__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .pagination__link:hover {
+    text-decoration: underline;
+  }
+
+  .pagination__status {
+    font-size: var(--text-sm);
+    color: var(--color-fg-muted);
+  }
+</style>
