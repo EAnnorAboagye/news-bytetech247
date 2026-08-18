@@ -21,4 +21,20 @@ All five: complete, real Pexels covers (credited), build-verified, pushed and li
 
 All six: complete, real Pexels covers (credited), build-verified. 22 placeholder posts remain (ai-news: 12, automobile: 2, big-tech: 2, electronics: 2, software-news: 2, startups: 2).
 
+## 2026-08-18 (round 3)
+
+- **Pennsylvania Gov. Shapiro signs an executive order imposing strict "GRID" requirements on AI data center developers — no fast-track permitting, no NDAs, developers pay their own grid-upgrade costs** (ai-news) — Source: pa.gov (official), NRDC, Philadelphia Inquirer, Aug 18 2026 — Status: drafted (src/content/blog/pennsylvania-shapiro-ai-data-center-executive-order, replaced placeholder eu-finalizes-ai-act-enforcement-guidelines)
+- **Stellantis recalls 848,511 US vehicles (Chrysler/Dodge/Jeep/Ram) over a software bug that can disable the rearview camera display; OTA fix** (automobile) — Source: CBS News, Detroit News, Kelley Blue Book, Aug 17-18 2026 — Status: drafted (src/content/blog/stellantis-recalls-848000-vehicles-rearview-camera, replaced placeholder wireless-ev-charging-roads-pilot)
+- **AI video startup Higgsfield raises $400M at a $5.4B valuation (up from $1.3B eight months ago), led by DST Global with Goldman Sachs Alternatives and Intel Capital** (startups) — Source: PR Newswire (official), CityAM, SiliconANGLE, Aug 17 2026 — Status: drafted (src/content/blog/higgsfield-ai-video-startup-400-million-series-b, replaced placeholder climate-tech-startup-15m-seed-round)
+- **Polaroid and Pokémon reveal an instant-camera collection (Poké Ball, Pikachu, Sylveon editions) for Pokémon's 30th anniversary** (electronics) — Source: DPReview, PetaPixel, Digital Camera World, Aug 18 2026 — Status: drafted (src/content/blog/polaroid-pokemon-instant-camera-collection, replaced placeholder next-gen-e-ink-tablets-hit-120hz)
+- **Lightyear launches the first agentic AI platform for enterprise telecom procurement, starting with two AI agents automating carrier quoting** (software-news) — Source: PR Newswire (official), TelecomTV, Fierce Network, Aug 18 2026 — Status: drafted (src/content/blog/lightyear-agentic-ai-platform-enterprise-telecom, replaced placeholder nodejs-26-built-in-typescript-execution)
+
+Dropped after failing the 48h freshness check on verification (flagging so they aren't re-surfaced
+as "fresh" next run without a second look): Nvidia Nemotron 3.5 Lightning (actually released Aug 11),
+Insta360 X6 (actually launched Aug 12), Kakao Kanana-2 (actually released Jul 28), and a "Gitpod
+browser-based VS Code" item that turned out to be a 2021 story mistakenly surfaced by a live search.
+
+All five: complete, real Pexels covers (credited), build-verified. 17 placeholder posts remain
+(ai-news: 11, automobile: 1, big-tech: 2, electronics: 1, software-news: 1, startups: 1).
+
 Electronics: no candidate cleared the bar this run — RSS results were dominated by unconfirmed spec-leak/rumor coverage (Poco M8x, Samsung foldables "expected 2027," etc.), nothing that was both a confirmed single-company event and independently corroborated. Not padded to fill the category — re-check next run.
