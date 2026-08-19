@@ -1,6 +1,6 @@
 ---
 name: news-sourcing
-description: Discover fresh (<48h) tech news candidates across news.bytetech247.com's six categories via Google News RSS search and official company/outlet blog feeds, shortlist them for approval, then hand each approved story to news-article for drafting. Stops for explicit approval before drafting and again before anything is committed/pushed. Use when asked to find news to cover, run a news scan, or start a new coverage cycle with no story already in hand.
+description: Discover fresh (<5 days) tech news candidates across news.bytetech247.com's six categories via Google News RSS search and official company/outlet blog feeds, shortlist them for approval, then hand each approved story to news-article for drafting. Stops for explicit approval before drafting and again before anything is committed/pushed. Use when asked to find news to cover, run a news scan, or start a new coverage cycle with no story already in hand.
 ---
 
 This is the stage that runs _before_ `news-article` — it answers "what should we actually be covering
@@ -20,10 +20,14 @@ or "find me 2").
   more.
 - **Candidate count** — default up to 5 per run, minimum 1. Never pad the shortlist to hit 5 — a real
   2-story shortlist beats a stretched 5-story one.
-- **Freshness window — 48 hours, not a round "recent."** This isn't an arbitrary choice: it matches
-  `src/pages/news-sitemap.xml.ts`'s own Google News sitemap window, already live on this site. A story
-  outside that window is either already stale for News surfacing or belongs in a different kind of
-  post entirely, not a fresh-news candidate. Check the real, dated source — never the sandbox's system
+- **Freshness window — 5 days, not a round "recent."** Widened from an original 48-hour default because
+  the tighter window was leaving too few candidates per run. This window governs discovery only — it is
+  a separate concern from `src/pages/news-sitemap.xml.ts`'s own 48-hour Google News sitemap cutoff,
+  which stays fixed at 48 hours regardless of this setting: that one is Google's actual News-sitemap
+  spec, not a style choice, and loosening it would risk the site's News eligibility. A story sourced
+  under this 5-day window that's already past 48 hours old simply won't appear in that specific
+  sitemap once built — it stays fully indexable everywhere else (sitemap.xml, RSS, the article page's
+  own NewsArticle schema). Check the real, dated source — never the sandbox's system
   clock — against actual calendar time.
 
 ## 2. Discovery — two channels, not a fixed feed list
@@ -83,7 +87,7 @@ Output, per candidate (1-5 total):
 ```
 STORY: <the actual news hook, one sentence>
 CATEGORY: <slug>
-SOURCE: <exact source> — <real date, within 48h>
+SOURCE: <exact source> — <real date, within 5 days>
 PRIMARY SOURCE: <confirmed — link it> OR <relying on secondary reporting from X, no primary public yet>
 WHY THIS CLEARS THE FRESHNESS BAR: <the specific detail, not "seems relevant">
 ```
@@ -105,8 +109,8 @@ Write (or update) `.claude/content-plans/discovered-news.md`:
 Update each entry's Status as it moves: `shortlisted` → `approved` → `drafted` (at which point the
 real post's slug is the source of truth for its progress) → `rejected` (keep the row rather than
 deleting it, so it isn't re-surfaced next run without a reason visible) → `stale` (if a shortlisted-but-
-not-yet-approved story ages out of the 48h window before the user gets to it — don't silently drop it,
-mark it and let a future run's freshness check decide whether a follow-up angle still applies).
+not-yet-approved story ages out of the 5-day window before the user gets to it — don't silently drop
+it, mark it and let a future run's freshness check decide whether a follow-up angle still applies).
 
 ## 7. Hand off approved stories — unchanged downstream skill
 
@@ -146,7 +150,7 @@ it speculatively.
 
 - [ ] Category scope resolved (all six, or the ones the user specified).
 - [ ] 1-5 stories shortlisted, never padded to hit the max.
-- [ ] Every story has a real, dated source inside the 48-hour window, checked against real calendar
+- [ ] Every story has a real, dated source inside the 5-day window, checked against real calendar
       time, not the sandbox date.
 - [ ] Every story's primary-source status is known and stated (confirmed source linked, or an explicit
       note that it relies on secondary reporting) — not left implicit.

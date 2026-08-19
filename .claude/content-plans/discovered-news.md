@@ -55,3 +55,32 @@ sensitive content (self-harm and romantic-roleplay restrictions) involving minor
 startups: 1).
 
 Electronics: no candidate cleared the bar this run — RSS results were dominated by unconfirmed spec-leak/rumor coverage (Poco M8x, Samsung foldables "expected 2027," etc.), nothing that was both a confirmed single-company event and independently corroborated. Not padded to fill the category — re-check next run.
+
+## 2026-08-18 (round 5)
+
+Freshness window widened from 48 hours to 5 days for discovery this round (per `news-sourcing`
+SKILL.md update) — does not affect `news-sitemap.xml.ts`, which stays fixed at 48 hours per Google's
+News-sitemap spec regardless of this setting.
+
+- **Z.ai's GLM-5.3 finds 1,097 critical/high-severity software vulnerabilities via unintended exploit-chain reasoning; open-weight release delayed for safety review** (ai-news) — Source: Axios, Aug 14 2026 — Status: drafted (src/content/blog/zai-glm-5-3-coding-model-cybersecurity-delay, replaced placeholder xai-grok-multimodal-update)
+- **Synchrony (Amazon/Walmart/Lowe's store-card issuer) partners with OpenAI to embed financing and checkout inside ChatGPT** (ai-news) — Source: Synchrony's own newsroom, Aug 2026 — Status: drafted (src/content/blog/synchrony-openai-chatgpt-shopping-partnership, replaced placeholder microsoft-copilot-agent-orchestration)
+- **Cartesia's Sonic-3.6 tops both Artificial Analysis speech leaderboards with sub-90ms latency** (ai-news) — Source: Cartesia's own launch announcement, Aug 18 2026 — Status: drafted (src/content/blog/cartesia-sonic-3-6-tts-model-leaderboard, replaced placeholder hugging-face-inference-pricing-cut)
+- **Einride to deploy 500 Tesla Semis for Amazon; SEC filings reveal Amazon holds warrants for ~12% of Einride** (automobile) — Source: GeekWire (citing SEC filings), Aug 18 2026 — Status: drafted (src/content/blog/einride-500-tesla-semis-amazon-stake, replaced placeholder solid-state-battery-ev-enters-production)
+- **Amazon invests $6B in a third Shreveport, LA data center campus, bringing its Northwest Louisiana total to $18B** (big-tech) — Source: The Center Square, Aug 18 2026 — Status: drafted (src/content/blog/amazon-6-billion-shreveport-data-center, replaced placeholder microsoft-earnings-beat-on-cloud-ai-demand)
+- **CMF Buds Neo confirmed to launch in India August 20, Nothing's sub-brand's most affordable earbuds yet** (electronics) — Source: The Tech Outlook (BIS certification-based reporting), Aug 18 2026 — Status: drafted (src/content/blog/cmf-buds-neo-india-launch, replaced placeholder smart-glasses-on-device-ai-mixed-reviews)
+- **Wispr Flow raises $280M Series B led by Menlo Ventures, valuation triples to $2B in nine months** (startups) — Source: Wispr's own blog, TechCrunch, Fortune, Aug 17 2026 — Status: drafted (src/content/blog/wispr-flow-280-million-series-b-valuation, replaced placeholder two-fintech-startups-announce-merger)
+
+Dropped after failing verification this round (surfaced as apparently recent but confirmed older than
+the 5-day window, or unconfirmed): Meta/Manus reversal (actually April), Mercedes-Benz recall
+(ambiguous/conflicting dates), CodeRabbit (Aug 12, 7 days old), DeepSeek Harness (Aug 13, 6 days),
+Xiaomi HyperOS 4 (Aug 13, 6 days), Adobe ChatGPT plugin (Aug 6, 13 days), BYD Denza N9 (ambiguous
+date), OpenAI Codex mobile (actually May), Microsoft/Chevron Texas power plant (actually March),
+OpenAI "rogue agent" incident (from Jul 23), Meta Muse Glimmer (Aug 10, 9 days), Cloudflare
+TypeScript CI SDK ("early August," likely stale), MiniMax Music3 (right at the 5-day boundary,
+deprioritized out of caution).
+
+All seven: complete, real Pexels covers (credited), not yet build-verified or committed (validation
+pass and single combined commit pending).
+
+7 placeholder posts remain (ai-news: 6, software-news: 1). Software-news: no candidate cleared
+verification this round either — re-check next run.

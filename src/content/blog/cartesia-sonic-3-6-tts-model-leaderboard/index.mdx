@@ -1,0 +1,46 @@
+---
+title: "Cartesia's Sonic-3.6 Tops Speech Model Leaderboards"
+description: "The streaming text-to-speech model hit #1 on both Artificial Analysis speech benchmarks with sub-90ms latency."
+date: 2026-08-18
+category: "ai-news"
+tags: ["cartesia", "text-to-speech"]
+coverImage: "./cover.jpg"
+coverImageAlt: "Stock photo of a condenser microphone, illustrative only, not Cartesia's actual product"
+coverImageCredit:
+  name: "Pixabay"
+  url: "https://www.pexels.com/@pixabay"
+---
+
+Cartesia shipped Sonic-3.6, a streaming text-to-speech model the company says now ranks first on
+both of Artificial Analysis's speech leaderboards, with under 90 milliseconds of
+time-to-first-audio.
+
+## The benchmarks
+
+Sonic-3.6 scored 1,283 Elo on Artificial Analysis's Provider Voice board and 1,123 on its
+Controlled Voice board, according to
+[Cartesia's own launch announcement](https://www.cartesia.ai/launch). The Controlled board clones
+every competing model onto the same eight reference voices, isolating the synthesis engine itself
+from any advantage a larger voice catalog might provide, which makes it the more objective of the
+two rankings.
+
+## What's under the hood
+
+The model runs on state space models rather than the transformer architecture most competing TTS
+systems use, and generates expressive speech, including laughter, across more than 40 languages.
+It ships roughly three months after Cartesia's previous release, Sonic-3.5, which remains what the
+company's own documentation still lists as its stable model while Sonic-3.6 is in beta.
+
+## Why it matters
+
+Sub-90ms latency is the detail that actually matters for real-time use, like a voice agent on a
+phone call, more than the naturalness scores that dominate most TTS marketing, since a technically
+excellent voice that lags is still unusable for a live conversation. Cartesia leading a benchmark
+it also helped define the terms of, via its own state-space-model approach, is worth a note of
+caution: Artificial Analysis is a third-party leaderboard, but a company's own launch post is
+still the primary source citing these exact numbers here, not an independent re-test.
+
+What to watch: independent latency and quality testing once Sonic-3.6 exits beta and becomes the
+documented stable model.
+
+More [AI News](/ai-news/) coverage, or everything tagged [cartesia](/tag/cartesia/).
