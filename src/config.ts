@@ -96,10 +96,13 @@ export const siteConfig = {
   // Same operator, same jurisdiction as bytetech247.com.
   jurisdiction: "Ghana",
 
-  // This domain's own dedicated GA4 property — distinct from
-  // bytetech247.com's own analyticsId, which would misattribute this
-  // site's traffic to the wrong property.
-  analyticsId: "G-QCK9SYFM29",
+  // This domain's own dedicated GA4 property, created inside the same
+  // GA account that manages bytetech247.com — a separate property with
+  // its own measurement ID, not bytetech247.com's own analyticsId (an
+  // earlier value here, G-QCK9SYFM29, actually was bytetech247.com's ID
+  // reused, which would have merged both sites' traffic into one stream
+  // with no clean way to see either site's numbers alone).
+  analyticsId: "G-5M08757CWB",
 
   // Same reasoning as analyticsId — a Cloudflare Web Analytics beacon
   // token is generated per-site in the dashboard once the zone exists.

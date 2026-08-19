@@ -96,6 +96,25 @@ const jsonLdBlocks = [
         });
       }
     </script>
+    <!-- Google tag (gtag.js) — a plain static script tag, loaded
+         immediately, per Google's own installation instructions ("copy
+         and paste immediately after the <head> element"). An earlier
+         version deferred this to window.load via a dynamically-created
+         script element (with a Trusted Types policy needed only because
+         dynamic script injection is the specific sink
+         require-trusted-types-for 'script' restricts) to shave a small
+         amount of main-thread work — at a real cost: a visitor who
+         skims a headline and leaves within a second or two, common on a
+         news site, could close the tab before window.load ever fired,
+         meaning gtag.js never started loading and that visit was never
+         counted. A static async tag doesn't block rendering (same as
+         the AdSense loader below) and starts downloading immediately,
+         with no Trusted Types handling needed since it isn't a
+         JavaScript-driven injection. -->
+    <script
+      async
+      src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.analyticsId}`}
+    ></script>
     <!-- Unconditionally rendered (rather than wrapped in a template
          {condition && (<script>...)} block — that pattern reliably broke
          prettier-plugin-astro's parser on this specific script's content,
@@ -103,9 +122,10 @@ const jsonLdBlocks = [
          inside the script itself: siteConfig.analyticsId now holds this
          domain's real GA4 property ID, so the guard below is always true
          in production, but it stays in place rather than being removed —
-         it's what keeps this from firing a broken request if analyticsId
-         is ever unset again (a local dev override, a future property
-         migration), the same reasoning that justified it originally. -->
+         it's what keeps this from firing broken gtag() calls if
+         analyticsId is ever unset again (a local dev override, a future
+         property migration), the same reasoning that justified it
+         originally. -->
     <script define:vars={{ analyticsId: siteConfig.analyticsId }}>
       if (analyticsId) {
         window.dataLayer = window.dataLayer || [];
@@ -127,23 +147,6 @@ const jsonLdBlocks = [
             page_path: window.location.pathname,
             page_title: document.title,
           });
-        });
-
-        window.addEventListener("load", () => {
-          const gtagSrc = `https://www.googletagmanager.com/gtag/js?id=${analyticsId}`;
-          const scriptUrl = window.trustedTypes
-            ? window.trustedTypes
-                .createPolicy("gtag-loader", {
-                  createScriptURL: (url) =>
-                    url === gtagSrc ? url : "about:blank",
-                })
-                .createScriptURL(gtagSrc)
-            : gtagSrc;
-          const script = document.createElement("script");
-          script.async = true;
-          script.fetchPriority = "low";
-          script.src = scriptUrl;
-          document.head.appendChild(script);
         });
       }
     </script>
