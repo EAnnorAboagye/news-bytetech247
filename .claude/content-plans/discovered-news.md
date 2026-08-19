@@ -84,3 +84,20 @@ pass and single combined commit pending).
 
 7 placeholder posts remain (ai-news: 6, software-news: 1). Software-news: no candidate cleared
 verification this round either — re-check next run.
+
+## 2026-08-19 (round 6)
+
+- **Cloudflare Workers AI adds DeepSeek V4 Pro and V4 Flash, the platform's first 1,048,576-token context window** (software-news) — Source: Cloudflare's own Workers AI docs/changelog, Aug 15 2026 — Status: drafted (src/content/blog/cloudflare-workers-ai-deepseek-v4-context-window, replaced placeholder vscode-2026-ships-native-ai-pair-review)
+- **Apple trained a proprietary AI model for the Chinese market with Alibaba's technical support, alongside Baidu's involvement — first such approval for a foreign firm by Beijing** (ai-news) — Source: Reuters (via MacRumors, Yahoo Finance, TechRepublic, Quartz, techtimes), Aug 14 2026 — Status: drafted (src/content/blog/apple-trains-china-ai-model-alibaba-baidu, replaced placeholder google-ships-gemini-3-6-longer-context)
+
+Genuinely thin round: ~24 search queries run across ai-news angles (frontier model releases, AI
+safety incidents, enterprise AI deals, robotics, China AI) turned up only these 2 inside the 5-day
+window. Most of the week's real ai-news stories were already claimed by round 5's shortlist; several
+promising leads (Gemini 3.7 Flash Aug 13, Grok 4.6 Aug 12, Perplexity Agent API Aug 13, IBM/OpenAI
+partnership Aug 13, Anthropic/UK AISI security incidents Jul 31-Aug 5) missed the 5-day window by
+1-8 days and were dropped rather than stretched in. Not padded to hit a target count.
+
+Both: complete, real Pexels covers (credited), not yet build-verified or committed.
+
+5 placeholder posts remain (ai-news: 5, software-news: 0). Software-news is fully caught up for the
+first time this cycle.

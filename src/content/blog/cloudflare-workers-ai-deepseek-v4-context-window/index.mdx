@@ -1,0 +1,50 @@
+---
+title: "Cloudflare Adds DeepSeek V4 With a 1M-Token Context"
+description: "Workers AI's first million-token context window arrives via DeepSeek V4 Pro and Flash, with thinking mode and function calling."
+date: 2026-08-15
+category: "software-news"
+tags: ["cloudflare", "deepseek", "workers-ai"]
+coverImage: "./cover.jpg"
+coverImageAlt: "Stock photo of a server rack in a data center, illustrative only, not Cloudflare's actual infrastructure"
+coverImageCredit:
+  name: "panumas nikhomkhai"
+  url: "https://www.pexels.com/@cookiecutter"
+---
+
+Cloudflare added DeepSeek V4 Pro and DeepSeek V4 Flash to its Workers AI platform on August 15,
+giving developers a 1,048,576-token context window, the first models on the platform to reach
+that mark.
+
+## What shipped
+
+The two models, `@cf/deepseek-ai/deepseek-v4-pro-0813` and `@cf/deepseek-ai/deepseek-v4-flash-0731`,
+are available now through Workers AI, according to
+[Cloudflare's own Workers AI model documentation](https://developers.cloudflare.com/workers-ai/models/).
+Both support reasoning (thinking mode), function calling, and vision, positioning them for
+long-horizon agent tasks rather than single-turn chat. DeepSeek V4 Flash is the faster,
+lower-cost option of the pair; V4 Pro is the larger model.
+
+## Why the context window matters here
+
+A million-token context window is large enough to hold an entire mid-sized codebase, a lengthy
+legal contract, or hours of transcribed audio in a single request, without the chunking and
+retrieval workarounds developers currently use to fit long documents into smaller context
+windows. Cloudflare frames the addition around long-horizon agent workflows and large-codebase
+tasks specifically, not general chat.
+
+## Why it matters
+
+This is a platform-integration story more than a model story: DeepSeek already shipped V4 Pro and
+Flash as its own release, and what's new here is Cloudflare making them available directly inside
+Workers AI alongside its existing model catalog and billing. That distinction matters for
+developers already building on Cloudflare's edge network, since it likely means one fewer
+external API integration and one fewer vendor relationship to manage for teams that want a
+long-context model without leaving the platform they're already deployed on. Whether developers
+actually need a million tokens of context for most real workloads, versus a well-designed
+retrieval pipeline over a smaller window, remains the open question a raw context-length number
+doesn't answer on its own.
+
+What to watch: real-world latency and cost at that context length once developers start using it
+in production, not just the headline token count.
+
+More [Tech Software](/software-news/) coverage, or everything tagged [cloudflare](/tag/cloudflare/).
