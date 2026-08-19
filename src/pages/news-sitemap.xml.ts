@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { siteConfig } from "../config";
 import { postUrl } from "../lib/rss";
+import { isPlaceholderPost } from "../lib/is-placeholder-post";
 
 // Google News sitemap (build plan Phase 11 stretch goal — genuinely
 // greenfield, no bytetech247.com equivalent since that site has no
@@ -20,6 +21,7 @@ export const GET: APIRoute = async () => {
   const posts = await getCollection("blog");
   const cutoff = Date.now() - NEWS_WINDOW_MS;
   const recentPosts = posts
+    .filter((post) => !isPlaceholderPost(post))
     .filter((post) => post.data.date.valueOf() >= cutoff)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 

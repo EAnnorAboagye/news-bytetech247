@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import { siteConfig, CATEGORIES } from "../config";
 import { postUrl } from "../lib/rss";
 import { getLastVerifiedDate } from "../lib/last-verified";
+import { isPlaceholderPost } from "../lib/is-placeholder-post";
 
 // Dynamic, build-time-generated sitemap — every static route plus every
 // post, with accurate per-post lastmod. Forked from bytetech247.com's
@@ -31,7 +32,13 @@ const STATIC_PATHS: { path: string; file: string }[] = [
 ];
 
 export const GET: APIRoute = async () => {
-  const posts = await getCollection("blog");
+  // Placeholder fixture posts still build (pagination/layout tests need
+  // them to exist) but are excluded here — a page whose body reads
+  // "Placeholder fixture post..." shouldn't be advertised to Google as a
+  // real, indexable URL.
+  const posts = (await getCollection("blog")).filter(
+    (post) => !isPlaceholderPost(post),
+  );
 
   const maxDate = (candidates: Date[]): Date | null =>
     candidates.length === 0

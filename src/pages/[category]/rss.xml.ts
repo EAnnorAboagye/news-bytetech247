@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { CATEGORIES, getCategoryName, siteConfig } from "../../config";
 import { buildRssFeed } from "../../lib/rss";
+import { isPlaceholderPost } from "../../lib/is-placeholder-post";
 
 export function getStaticPaths() {
   return CATEGORIES.map((category) => ({
@@ -14,7 +15,10 @@ export const GET: APIRoute = async ({ params }) => {
   const categoryName = getCategoryName(category);
 
   const posts = (
-    await getCollection("blog", (post) => post.data.category === category)
+    await getCollection(
+      "blog",
+      (post) => post.data.category === category && !isPlaceholderPost(post),
+    )
   ).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
   const body = await buildRssFeed({
