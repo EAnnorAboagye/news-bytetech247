@@ -1,0 +1,50 @@
+---
+title: "Google Shuts Down Imagen 4 API Endpoints, No Direct Swap"
+description: "Google retired Imagen 4's Gemini API endpoints on August 17, and the replacement model doesn't use the same method call."
+date: 2026-08-17
+category: "ai-news"
+tags: ["google", "gemini", "imagen"]
+coverImage: "./cover.jpg"
+coverImageAlt: "Stock photo of colorful code displayed on a monitor, illustrative only, not an actual Google API console"
+coverImageCredit:
+  name: "Markus Spiske"
+  url: "https://www.pexels.com/@markusspiske"
+---
+
+Google shut down Imagen 4's Gemini API endpoints on August 17, 2026, retiring the
+`imagen-4.0-generate-001`, `imagen-4.0-fast-generate-001`, and `imagen-4.0-ultra-generate-001`
+models, per [Google's own Gemini API release notes and changelog](https://ai.google.dev/gemini-api/docs/changelog).
+Developers still calling those endpoints after the cutoff get hard failures, not a graceful fallback.
+
+## What actually changed
+
+Google's documented replacement is Gemini 3.1 Flash Image, the model most developers know by its
+codename, Nano Banana 2, but the migration is not a drop-in model swap. The `generate_images()`
+method that Imagen calls used is gone entirely for the replacement model; image generation now runs
+through `generate_content()`, the same call a developer would already use for text generation,
+according to reporting from [Virtual Arc Software](https://www.virtualarcsoftware.com/blog/google-imagen4-gemini-api-shutdown/)
+and [Clauding](https://clauding.de/en/posts/google-imagen-4-abschaltung), which both walked through
+the changed request shape after the endpoints went dark.
+
+This is the second stage of a staged retirement. Google deprecated Imagen 4 on Vertex AI back on
+March 24, 2026, with that platform's own endpoints hitting their deprecation date on June 30. The
+Gemini API's Imagen 4 endpoints, the ones most individual developers and smaller integrations
+actually called, were the last piece still standing until this week's cutoff.
+
+## Why it matters
+
+A method-signature change, not just a model-ID swap, is the kind of migration that breaks silently in
+production if a team only updates the model string and assumes the rest of the call still works. Any
+integration built directly against `generate_images()` needs a real code change, not a config edit,
+before it can call the replacement model at all.
+
+The four-month gap between the Vertex AI deprecation and this week's Gemini API shutdown likely gave
+most production teams enough lead time to migrate deliberately, but it also means any integration that
+was quietly ignoring deprecation warnings has now had its assumption broken all at once, on a specific
+date, with no soft landing.
+
+What to watch: whether Google applies the same `generate_content()`-first pattern to future image and
+video model releases, which would make this migration a one-time adjustment rather than a recurring
+one every time an image model gets replaced.
+
+More [AI News](/ai-news/) coverage, or everything tagged [google](/tag/google/).

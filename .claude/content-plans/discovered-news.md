@@ -97,6 +97,20 @@ promising leads (Gemini 3.7 Flash Aug 13, Grok 4.6 Aug 12, Perplexity Agent API 
 partnership Aug 13, Anthropic/UK AISI security incidents Jul 31-Aug 5) missed the 5-day window by
 1-8 days and were dropped rather than stretched in. Not padded to hit a target count.
 
+## 2026-08-19 (round 7)
+
+- **Anthropic's August 2026 Risk Report discloses an unreleased internal "Model 2," citing incomplete pre-deployment safety evaluation** (ai-news) — Source: anthropic.com/aug-2026-risk-report, Aug 14 2026 — Status: approved
+- **Google shuts down Imagen 4's Gemini API endpoints, forcing a non-trivial migration to the Gemini image model** (ai-news) — Source: Google's own Imagen 4 deprecation notice, shutdown effective Aug 17 2026 — Status: approved
+- **Nvidia's H200 AI chips begin reaching China again in limited batches (ByteDance, Tencent each ~10,000 chips)** (ai-news) — Source: Financial Times, corroborated by CNBC/Benzinga/Yahoo Finance, Aug 19 2026 — Status: approved
+
+Explicitly checked round 6's own rejected-leads list before shortlisting this round, to avoid re-proposing
+candidates already assessed and dropped for freshness in the same session (Gemini 3.7 Flash, DeepSeek
+Harness, Meta Muse Glimmer all re-surfaced in this round's searches and were deliberately excluded again,
+same reasons as round 6). ~10 additional search queries beyond round 6's 24 still turned up only these 3
+genuinely fresh, non-duplicate ai-news candidates — user confirmed proceeding with 3 rather than padding
+to 5; the remaining 2 placeholder slots (amazon-titan-model-family-expansion,
+meta-llama-4-open-weights-release) stay open for a future run.
+
 Both: complete, real Pexels covers (credited), not yet build-verified or committed.
 
 5 placeholder posts remain (ai-news: 5, software-news: 0). Software-news is fully caught up for the
