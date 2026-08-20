@@ -101,8 +101,11 @@ export const siteConfig = {
   // its own measurement ID, not bytetech247.com's own analyticsId (an
   // earlier value here, G-QCK9SYFM29, actually was bytetech247.com's ID
   // reused, which would have merged both sites' traffic into one stream
-  // with no clean way to see either site's numbers alone).
-  analyticsId: "G-5M08757CWB",
+  // with no clean way to see either site's numbers alone). Updated again
+  // 2026-08-20 to G-ZF8PK9Y0SR — the previous ID (G-5M08757CWB) was
+  // never actually live on production, so GA's own tag-detection check
+  // reported no tracking code found on the index page at all.
+  analyticsId: "G-ZF8PK9Y0SR",
 
   // Same reasoning as analyticsId — a Cloudflare Web Analytics beacon
   // token is generated per-site in the dashboard once the zone exists.
