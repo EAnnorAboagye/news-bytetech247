@@ -1,10 +1,12 @@
 import { test, expect } from "@playwright/test";
 
 // Functional coverage for Astro's paginate() — the first real use
-// anywhere in this codebase family (build plan Phase 8). ai-news has 13
-// seed posts against a pageSize of 12 specifically so /ai-news/2/ is a
+// anywhere in this codebase family (build plan Phase 8). ai-news has
+// more posts than the pageSize of 12 specifically so /ai-news/2/ is a
 // real, permanent route in production, not a route that only existed
-// during a one-off manual verification.
+// during a one-off manual verification. The exact page-2 count below
+// tracks however many ai-news posts exist beyond the first 12 — update
+// it whenever a new ai-news post ships (currently 14 total, 2 on page 2).
 //
 // Link locators are scoped to the Pagination <nav> specifically, not a
 // bare page-wide name match — every seed post's cover image alt text
@@ -27,11 +29,11 @@ test.describe("Category pagination", () => {
     );
   });
 
-  test("page 2 shows the remaining post and links back to page 1", async ({
+  test("page 2 shows the remaining posts and links back to page 1", async ({
     page,
   }) => {
     await page.goto("/ai-news/2/");
-    await expect(page.locator(".post-card-wrapper")).toHaveCount(1);
+    await expect(page.locator(".post-card-wrapper")).toHaveCount(2);
     const pagination = page.getByRole("navigation", { name: "Pagination" });
     const newerLink = pagination.getByRole("link", { name: /Newer/i });
     await expect(newerLink).toHaveAttribute("href", "/ai-news/");
@@ -49,11 +51,11 @@ test.describe("Category pagination", () => {
     );
   });
 
-  test("a category with only 4 posts has no pagination controls", async ({
+  test("a category with fewer than 12 posts has no pagination controls", async ({
     page,
   }) => {
     await page.goto("/startups/");
-    await expect(page.locator(".post-card-wrapper")).toHaveCount(4);
+    await expect(page.locator(".post-card-wrapper")).toHaveCount(5);
     await expect(
       page.getByRole("navigation", { name: "Pagination" }),
     ).toHaveCount(0);
