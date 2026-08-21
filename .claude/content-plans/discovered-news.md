@@ -115,3 +115,22 @@ Both: complete, real Pexels covers (credited), not yet build-verified or committ
 
 5 placeholder posts remain (ai-news: 5, software-news: 0). Software-news is fully caught up for the
 first time this cycle.
+
+## 2026-08-21 (round 8)
+
+- **OpenAI pauses training on its next frontier model ("Astra") after it approached the "Critical" cybersecurity capability threshold in its own Preparedness Framework — first time OpenAI has done this — and begins a safety-protocol overhaul** (ai-news) — Source: Axios, Aug 18 2026; corroborated by Time, PYMNTS, Help Net Security, Futurism, Daily Caller — Status: drafted (src/content/blog/openai-pauses-astra-model-critical-cyber-risk, primary source: OpenAI's own blog post, new post not a placeholder replacement)
+- **OpenAI CFO Sarah Friar tells staff at an all-hands the company "will be a public company in 2027, or sooner" — first explicit IPO timeline, following a confidential S-1 filing in June** (big-tech) — Source: CNBC, Aug 19 2026; corroborated by TheNextWeb, FinanceFeeds, Quartz, HDFC Sky — Status: drafted (src/content/blog/openai-cfo-2027-ipo-timeline, new post)
+- **Marvell grants Google the right to buy up to $12.2B of its shares as part of an expanded custom AI-chip deal spanning TPU-adjacent processors, storage, and networking silicon — challenges Broadcom's position as Google's lead custom-chip partner** (big-tech) — Source: Bloomberg, Aug 19 2026 (regulatory filing); corroborated by CNBC, Yahoo Finance, Benzinga — Status: drafted (src/content/blog/marvell-google-12-billion-chip-deal-warrant, new post)
+- **Rillet, an AI-native ERP/accounting-automation startup, raises a $100M Series C led by ICONIQ at a $1B valuation — third raise in a year, unicorn status ~2 years out of stealth** (startups) — Source: TechCrunch, Aug 19 2026; corroborated by VentureBeat, Yahoo Finance, Rillet's own blog — Status: drafted (src/content/blog/rillet-100-million-series-c-unicorn, primary source: Rillet's own blog post)
+
+All four: complete, real Pexels covers (credited, cropped to 1600x900), `npm run check` passed
+(0 errors). Build/unit-test verification and commit still pending final user approval.
+
+Automobile and electronics: no candidate cleared the freshness/hook bar this round — searches surfaced
+only minor regional phone launches (Tecno Pova 8 Pro, iQOO Z11 India) and routine vehicle recalls
+(infant seat, Ram 1500 seatbelt anchors), nothing both fresh and substantial. Not padded to fill.
+
+Two of these four fill the two remaining ai-news placeholder slots' worth of freshness, though only
+the Astra story is categorized ai-news itself (the IPO story fits big-tech better per editorial
+precedent from round 1's Anthropic revenue/IPO-race post). ai-news placeholder count stays at 4 after
+this round; the OpenAI IPO and Marvell/Google stories are both big-tech.
